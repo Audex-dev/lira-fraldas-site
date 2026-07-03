@@ -1,11 +1,20 @@
 <title>Lira Fraldas — Loja Prática</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Fraldas e cosméticos em Fortaleza. Monte seu pedido e finalize no WhatsApp.">
+<meta name="theme-color" content="#33A98F">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-180.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Lira Fraldas">
 <style>
   /* ===== Template B — "Loja Prática" (ref: Senhor Pandinha) =====
      Catálogo real, filtro por tamanho de fralda + preço. Paleta da marca:
      menta/teal + rosa, tinta navy. Mundo claro. */
   :root{
-    --navy:#33415A; --navy-deep:#26324A; --ink:#33415A; --muted:#7C8AA3;
+    --navy:#33415A; --navy-deep:#26324A; --ink:#33415A; --muted:#5A6A82;
     --mint:#5FC7B0; --mint-deep:#33A98F; --mint-soft:#E6F7F2;
     --pink:#F0919C; --pink-deep:#E06E7D;
     /* paleta multicolor pastel da logo (estilo "colorido e fofinho") */
@@ -20,6 +29,7 @@
   .wrap{max-width:1180px;margin:0 auto;padding:0 18px}
 
   .top{background:var(--navy);color:#fff;font-size:13px;font-weight:600;text-align:center;padding:8px}
+  .top-short{display:none}
   header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,var(--mint),var(--mint-deep));color:var(--navy-deep)}
   .hbar{display:flex;align-items:center;gap:18px;padding:13px 0}
   .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:20px;letter-spacing:-.3px;white-space:nowrap}
@@ -27,12 +37,12 @@
   .brand small{display:block;font-size:11px;font-weight:600;opacity:.9}
   .search{flex:1;display:flex;background:#fff;border-radius:999px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.10)}
   .search input{flex:1;border:0;padding:13px 18px;font-size:15px;outline:none;color:var(--ink)}
-  .search button{border:0;background:var(--pink);color:#fff;padding:0 22px;font-size:17px;cursor:pointer}
+  .search button{border:0;background:var(--navy);color:#fff;padding:0 22px;font-size:17px;cursor:pointer}
   .hact{display:flex;align-items:center;gap:16px}
   .hlink{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;cursor:pointer}
   .hlink .ic{font-size:21px}
   .cartn{background:var(--pink);color:var(--navy-deep);font-size:11px;font-weight:800;border-radius:999px;padding:1px 7px;margin-left:2px}
-  nav.menu{background:var(--mint-deep);border-top:1px solid rgba(255,255,255,.14)}
+  nav.menu{background:#2D9478;border-top:1px solid rgba(255,255,255,.14)}
   .menu ul{list-style:none;display:flex;gap:2px;margin:0;padding:0;overflow-x:auto;scrollbar-width:none}
   .menu ul::-webkit-scrollbar{display:none}
   .menu a{display:block;padding:12px 15px;font-weight:600;font-size:13.5px;color:var(--navy-deep);white-space:nowrap;cursor:pointer}
@@ -43,14 +53,14 @@
   .hcard .kk{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;opacity:.92;margin-bottom:12px}
   .hcard h1{margin:0 0 14px;font-size:36px;line-height:1.05;letter-spacing:-.5px;text-wrap:balance}
   .hcard p{margin:0 0 22px;font-size:16px;opacity:.96;max-width:32ch}
-  .hcard .cta{align-self:flex-start;background:#fff;color:var(--mint-deep);font-weight:800;padding:14px 26px;border-radius:999px;font-size:15px;cursor:pointer}
+  .hcard .cta{align-self:flex-start;background:#fff;color:var(--navy-deep);font-weight:800;padding:14px 26px;border-radius:999px;font-size:15px;cursor:pointer}
   .hcard .blob{position:absolute;right:-18px;bottom:-28px;font-size:140px;opacity:.22;transform:rotate(8deg)}
   .hside{display:grid;grid-template-rows:1fr 1fr;gap:22px}
   .mini{border-radius:18px;padding:24px;display:flex;flex-direction:column;justify-content:center;background:var(--panel);border:1px solid var(--line)}
   .mini h3{margin:0 0 4px;font-size:18px;color:var(--navy)}
   .mini p{margin:0;color:var(--muted);font-size:14px}
   .mini.b{background:var(--mint-soft)}
-  .mini .cta2{margin-top:10px;color:var(--mint-deep);font-weight:800;font-size:14px;cursor:pointer}
+  .mini .cta2{margin-top:10px;color:#1A7A66;font-weight:800;font-size:14px;cursor:pointer}
 
   .catsec{margin:38px 0}
   .catsec h2{font-size:23px;margin:0 0 4px;letter-spacing:-.3px;color:var(--navy)}
@@ -84,7 +94,7 @@
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(198px,1fr));gap:16px}
   .prod{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transition:.15s;position:relative}
   .prod:hover{box-shadow:var(--shadow);transform:translateY(-3px)}
-  .tag{position:absolute;top:12px;left:12px;background:var(--pink);color:#fff;font-size:11px;font-weight:800;border-radius:7px;padding:3px 9px}
+  .tag{position:absolute;top:12px;left:12px;background:var(--pink);color:var(--navy-deep);font-size:11px;font-weight:800;border-radius:7px;padding:3px 9px}
   .pimg{aspect-ratio:1;display:grid;place-items:center;font-size:60px;background:linear-gradient(135deg,var(--mint-soft),#FFEEF0);overflow:hidden}
   .pimg.has-photo{background:#fff}
   .pimg img{width:100%;height:100%;object-fit:contain;padding:10px}
@@ -170,12 +180,19 @@
     .buy{min-height:48px;padding:13px}
     .sz{min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center}
     .menu a{padding:13px 15px}
+    .stepper button{width:44px;height:44px;font-size:18px}
+    .ci-rm{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
   }
   @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+  /* Nudge de frete nos cards de produto */
+  .frete-hint{font-size:11px;color:#1A7A66;font-weight:600;margin:0 0 10px;line-height:1.3}
+  @media(max-width:640px){.frete-hint{font-size:10px;margin-bottom:8px}}
+  /* Top bar: versão curta no mobile */
+  @media(max-width:640px){.top-full{display:none}.top-short{display:inline}}
 
   /* ===== Carrinho ===== */
-  .add{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:7px;background:var(--mint-deep);color:#fff;font-weight:700;font-size:14px;border:0;border-radius:10px;padding:11px;cursor:pointer;transition:.15s}
-  .add:hover{background:var(--mint)}
+  .add{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:7px;background:#1A7A66;color:#fff;font-weight:700;font-size:14px;border:0;border-radius:10px;padding:11px;cursor:pointer;transition:.15s}
+  .add:hover{background:var(--mint-deep)}
   .add:active{transform:scale(.97)}
   .add:focus-visible{outline:2px solid var(--navy);outline-offset:3px}
   .add.done{background:var(--navy)}
@@ -193,12 +210,12 @@
   .ci-img img{width:100%;height:100%;object-fit:contain;padding:4px}
   .ci-mid{flex:1;min-width:0}
   .ci-name{font-size:13px;font-weight:600;color:var(--navy);line-height:1.32}
-  .ci-price{font-size:13px;color:var(--mint-deep);font-weight:800;margin-top:2px}
+  .ci-price{font-size:13px;color:var(--navy);font-weight:800;margin-top:2px}
   .stepper{display:inline-flex;align-items:center;margin-top:9px;border:1.5px solid var(--line);border-radius:9px;overflow:hidden}
   .stepper button{width:30px;height:30px;border:0;background:var(--panel);color:var(--navy);font-size:16px;font-weight:800;cursor:pointer;line-height:1}
   .stepper button:hover{background:var(--mint-soft)}
   .stepper span{min-width:36px;text-align:center;font-weight:700;font-size:14px}
-  .ci-rm{background:none;border:0;color:var(--muted);cursor:pointer;font-size:15px;align-self:flex-start;padding:2px}
+  .ci-rm{background:none;border:0;color:var(--muted);cursor:pointer;font-size:15px;align-self:flex-start;padding:10px;margin:-8px}
   .ci-rm:hover{color:var(--pink-deep)}
   .cart-empty{text-align:center;color:var(--muted);padding:54px 24px;font-size:15px}
   .cart-f{border-top:1px solid var(--line);padding:16px 18px;background:var(--panel)}
@@ -211,16 +228,41 @@
   .cart-cta:disabled{opacity:.45;cursor:not-allowed}
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;z-index:70;opacity:0;pointer-events:none;transition:.22s;box-shadow:0 8px 24px rgba(38,50,74,.35)}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ===== Forma de pagamento (carrinho + rodapé) ===== */
+  .cart-pay{margin:0 0 12px}
+  .cart-pay > span{display:block;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:7px}
+  .pays{display:flex;flex-wrap:wrap;gap:7px}
+  .pay{border:1.5px solid var(--line);background:#fff;color:var(--navy);border-radius:9px;padding:8px 11px;font-size:12.5px;font-weight:700;cursor:pointer;transition:.15s}
+  .pay:hover{border-color:var(--mint)}
+  .pay.on{border-color:var(--mint-deep);background:var(--mint-soft);color:#1A7A66}
+  .pay:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+  @media(max-width:640px){.pay{min-height:40px}}
+  .fpay{font-size:13px;color:#b9c4d6;line-height:1.5;margin:14px 0 0}
+  .fpay b{color:#fff;font-weight:700;display:block;margin-bottom:4px}
+
+  /* ===== PWA / mobile — sem vazamento ===== */
+  html{-webkit-text-size-adjust:100%}
+  html,body{overflow-x:hidden}
+  body{overscroll-behavior-y:none}
+  img{max-width:100%}
+  .cart-list{overscroll-behavior:contain}          /* rolar o carrinho não arrasta o fundo */
+  .cart-h{padding-top:calc(17px + env(safe-area-inset-top))}
+  .cart-f{padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+  .float{bottom:calc(18px + env(safe-area-inset-bottom))}
+  @supports(padding:max(0px)){
+    .wrap{padding-left:max(18px,env(safe-area-inset-left));padding-right:max(18px,env(safe-area-inset-right))}
+  }
 </style>
 
-<div class="top">🚚 Entrega em Fortaleza a partir de R$ 10 · frete grátis a partir de R$ 30 · retirada grátis na loja · 💬 pedido no WhatsApp</div>
+<div class="top"><span class="top-full">🚚 Entrega em Fortaleza a partir de R$ 10 · frete grátis a partir de R$ 30 · retirada grátis na loja · 💬 pedido no WhatsApp</span><span class="top-short">🚚 Frete grátis a partir de R$ 30 · pedido no WhatsApp</span></div>
 
 <header>
   <div class="wrap hbar">
     <a class="brand"><img src="logo.png" alt="Lira Fraldas e Cosméticos"><span>Lira Fraldas<small>Fraldas e cosméticos</small></span></a>
     <form class="search" onsubmit="return false">
       <input id="q" placeholder="O que você está buscando?" aria-label="Buscar">
-      <button aria-label="Buscar" onclick="document.getElementById('q').focus()">🔍</button>
+      <button aria-label="Buscar" onclick="search(document.getElementById('q').value)">🔍</button>
     </form>
     <div class="hact">
       <div class="hlink" role="button" tabindex="0" aria-label="Entrar na conta"><span class="ic">👤</span><span class="txt">Entrar</span></div>
@@ -240,8 +282,8 @@
       <span class="blob">👶</span>
     </div>
     <div class="hside">
-      <div class="mini b"><h3>🧷 Fraldas por tamanho</h3><p>Ache rápido do RN ao XXG.</p><span class="cta2" onclick="showDept('Fraldas')">Ver fraldas →</span></div>
-      <div class="mini"><h3>🍼 Chá de fralda</h3><p>Monte a lista com a gente e facilite pros convidados.</p><span class="cta2" onclick="pedirCha()">Organizar meu chá →</span></div>
+      <div class="mini b"><h3>🧷 Fraldas por tamanho</h3><p>Ache rápido do RN ao XXG.</p><span class="cta2" role="button" tabindex="0" onclick="showDept('Fraldas')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Ver fraldas →</span></div>
+      <div class="mini"><h3>🍼 Chá de fralda</h3><p>Monte a lista com a gente e facilite pros convidados.</p><span class="cta2" role="button" tabindex="0" onclick="pedirCha()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Organizar meu chá →</span></div>
     </div>
   </div>
 
@@ -289,9 +331,10 @@
       <div>
         <div class="fbrand"><img src="logo.png" alt=""><b>Lira Fraldas</b></div>
         <p class="fnote">Loja de fraldas e cosméticos em Fortaleza/CE. Atendimento humano no WhatsApp.</p>
+        <p class="fpay"><b>Formas de pagamento</b>Dinheiro · Pix · Débito · Crédito · Parcelado</p>
       </div>
       <div><h4>Departamentos</h4><a onclick="showDept('Fraldas')">Fraldas</a><a onclick="showDept('Sabonetes')">Sabonetes</a><a onclick="showDept('Cremes & Hidratantes')">Cremes</a><a onclick="showDept('Cabelo')">Cabelo</a></div>
-      <div><h4>Ajuda</h4><a href="#">Quem somos</a><a href="#">Trocas e devoluções</a><a href="#">Formas de pagamento</a></div>
+      <div><h4>Ajuda</h4><a onclick="pedirGeral()">Quem somos</a><a onclick="pedirGeral()">Trocas e devoluções</a><a onclick="pedirGeral()">Dúvidas no WhatsApp</a></div>
       <div><h4>Contato</h4><a onclick="pedirGeral()">💬 WhatsApp</a><a href="https://www.instagram.com/lira_fraldas/">📷 @lira_fraldas</a><a href="#">📍 Fortaleza/CE</a></div>
     </div>
     <div class="fbottom">
@@ -301,14 +344,18 @@
   </div>
 </footer>
 
-<a class="float" onclick="pedirGeral()" role="button" tabindex="0" aria-label="Falar no WhatsApp" title="Falar no WhatsApp">💬</a>
+<button class="float" onclick="pedirGeral()" aria-label="Falar no WhatsApp" title="Falar no WhatsApp">💬</button>
 
 <!-- Carrinho -->
 <div class="cart-ov" id="cart-ov" onclick="closeCart()"></div>
 <aside class="cart-p" id="cart-p" role="dialog" aria-modal="true" aria-label="Carrinho de compras">
-  <div class="cart-h"><h3>🛒 Meu carrinho</h3><button class="cart-x" aria-label="Fechar carrinho" onclick="closeCart()">✕</button></div>
+  <div class="cart-h"><h3><span aria-hidden="true">🛒</span> Meu carrinho</h3><button class="cart-x" aria-label="Fechar carrinho" onclick="closeCart()">✕</button></div>
   <div class="cart-list" id="cart-list"></div>
   <div class="cart-f">
+    <div class="cart-pay">
+      <span>Forma de pagamento</span>
+      <div class="pays" id="pays" role="radiogroup" aria-label="Forma de pagamento"></div>
+    </div>
     <div class="cart-sub"><span>Subtotal</span><b id="cart-total">R$ 0,00</b></div>
     <div class="cart-frete" id="cart-frete"></div>
     <button class="cart-cta" id="cart-cta" onclick="finalizarPedido()">💬 Finalizar pedido no WhatsApp</button>
@@ -319,7 +366,7 @@
 <script src="produtos.js"></script>
 <script>
   const WA="5585999587768"; // WhatsApp oficial da Lira Fraldas
-  function pedir(nome,preco){window.open(`https://wa.me/${WA}?text=`+encodeURIComponent(`Olá, Lira Fraldas! 👋 Tenho interesse em: *${nome}* (${preco}). Pode me ajudar?`),"_blank");}
+  function pedir(nome,preco){window.open(`https://wa.me/${WA}?text=`+encodeURIComponent(`Olá, Lira Fraldas! 👋 Quero comprar: *${nome}* — ${preco}. Qual a disponibilidade e como pagar?`),"_blank");}
   function pedirGeral(){window.open(`https://wa.me/${WA}?text=`+encodeURIComponent("Olá, Lira Fraldas! Gostaria de tirar uma dúvida / fazer um pedido."),"_blank");}
   function pedirCha(){window.open(`https://wa.me/${WA}?text=`+encodeURIComponent("Olá, Lira Fraldas! 🍼 Quero organizar um chá de fralda. Podem me ajudar com a lista e as fraldas?"),"_blank");}
 
@@ -345,8 +392,35 @@
   };
   window.chgQty=(id,d)=>{if(!cart[id])return;cart[id].q+=d;if(cart[id].q<=0)delete cart[id];saveCart();updateCart();};
   window.rmItem=(id)=>{delete cart[id];saveCart();updateCart();};
-  window.openCart=()=>{document.getElementById("cart-ov").classList.add("open");document.getElementById("cart-p").classList.add("open");document.body.style.overflow="hidden";};
-  window.closeCart=()=>{document.getElementById("cart-ov").classList.remove("open");document.getElementById("cart-p").classList.remove("open");document.body.style.overflow="";};
+  let _cartTrigger=null,_trapHandler=null;
+  window.openCart=()=>{
+    _cartTrigger=document.activeElement;
+    document.getElementById("cart-ov").classList.add("open");
+    const cartP=document.getElementById("cart-p");
+    cartP.classList.add("open");
+    document.body.style.overflow="hidden";
+    setTimeout(()=>{
+      const closeBtn=cartP.querySelector(".cart-x");
+      if(closeBtn)closeBtn.focus();
+      const getFocusable=()=>Array.from(cartP.querySelectorAll('button,[href],input,[tabindex]:not([tabindex="-1"])'));
+      _trapHandler=(e)=>{
+        if(e.key!=="Tab")return;
+        const els=getFocusable(); if(!els.length)return;
+        const first=els[0],last=els[els.length-1];
+        if(e.shiftKey){if(document.activeElement===first){e.preventDefault();last.focus();}}
+        else{if(document.activeElement===last){e.preventDefault();first.focus();}}
+      };
+      cartP.addEventListener("keydown",_trapHandler);
+    },50);
+  };
+  window.closeCart=()=>{
+    const cartP=document.getElementById("cart-p");
+    if(_trapHandler){cartP.removeEventListener("keydown",_trapHandler);_trapHandler=null;}
+    document.getElementById("cart-ov").classList.remove("open");
+    cartP.classList.remove("open");
+    document.body.style.overflow="";
+    if(_cartTrigger&&_cartTrigger.focus){try{_cartTrigger.focus();}catch(e){}_cartTrigger=null;}
+  };
 
   function freteInfo(sub){
     if(sub>=FRETE_GRATIS)return{txt:"🎉 Você ganhou frete grátis! (pedido a partir de R$ 30)",free:true};
@@ -379,14 +453,34 @@
     document.getElementById("cart-cta").disabled=!items.length;
   }
 
+  // ===== Forma de pagamento (aceitas pela loja; pronto p/ PinPDV) =====
+  const PAGAMENTOS=[
+    {v:"dinheiro",  t:"Dinheiro"},
+    {v:"pix",       t:"Pix"},
+    {v:"debito",    t:"Débito"},
+    {v:"credito",   t:"Crédito"},
+    {v:"parcelado", t:"Parcelado"},
+  ];
+  let formaPagamento=localStorage.getItem("lira-pay")||"";
+  function getFormaPagamento(){return formaPagamento;} // machine-readable p/ integração
+  function renderPagamentos(){
+    const el=document.getElementById("pays"); if(!el)return;
+    el.innerHTML=PAGAMENTOS.map(p=>`<button type="button" class="pay${formaPagamento===p.v?' on':''}" role="radio" aria-checked="${formaPagamento===p.v}" onclick="setPagamento('${p.v}')">${p.t}</button>`).join("");
+  }
+  window.setPagamento=(v)=>{formaPagamento=(formaPagamento===v?"":v);localStorage.setItem("lira-pay",formaPagamento);renderPagamentos();};
+  // TODO PinPDV: quando integrar cartão (débito/crédito/parcelado) via PinPDV (pinpad Audex),
+  // usar getFormaPagamento() aqui para acionar o pinpad/checkout de cartão em vez de só WhatsApp.
+
   window.finalizarPedido=()=>{
     const items=Object.values(cart); if(!items.length)return;
     const sub=cartTotal(), fi=freteInfo(sub);
+    const pg=PAGAMENTOS.find(p=>p.v===getFormaPagamento());
     let msg="Olá, Lira Fraldas! 👋 Quero fazer um pedido:\n\n";
     msg+=items.map(i=>`• ${i.q}x ${i.n} — ${i.p}`).join("\n");
     msg+=`\n\n*Subtotal: ${fmt(sub)}*`;
     msg+=fi.free?"\nFrete: grátis 🎉":"\nFrete: a combinar pelo bairro";
-    msg+="\n\nMeu bairro para entrega: \nForma de pagamento: ";
+    msg+="\nForma de pagamento: "+(pg?pg.t:"(a combinar)");
+    msg+="\n\nMeu bairro para entrega: ";
     window.open(`https://wa.me/${WA}?text=`+encodeURIComponent(msg),"_blank");
   };
   const PER=24; let base=[], view=[], shown=0, curDept=cats[0].nome, sz="", pmin=0, pmax=1e9;
@@ -399,7 +493,8 @@
       <div class="pcat">${p.d}${p.t?' · '+p.t:''}</div>
       <div class="pname">${p.n}</div>
       <div class="price">${p.p}</div>
-      <div class="parc">à vista no Pix</div>
+      <div class="parc">💳 Pix, dinheiro ou cartão</div>
+      <div class="frete-hint">🚚 Frete grátis a partir de R$ 30</div>
       <button class="add" onclick="addCart(${p.id})">＋ Adicionar</button>
     </div>
   </article>`;
@@ -440,10 +535,10 @@
     apply();
   }
 
-  document.getElementById("cats").innerHTML=cats.map(c=>`<div class="cat" tabindex="0" role="button" data-d="${c.nome}" onclick="showDept('${c.nome.replace(/'/g,"\\'")}')"><div class="disc">${c.emoji}</div><b>${c.nome}</b><small>${c.n}</small></div>`).join("");
-  document.getElementById("menu").innerHTML=cats.slice(0,9).map(c=>`<li><a tabindex="0" data-d="${c.nome}" onclick="showDept('${c.nome.replace(/'/g,"\\'")}')">${c.nome}</a></li>`).join("");
+  document.getElementById("cats").innerHTML=cats.map(c=>`<div class="cat" tabindex="0" role="button" data-d="${c.nome}" onclick="showDept('${c.nome.replace(/'/g,"\\'")}') " onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><div class="disc">${c.emoji}</div><b>${c.nome}</b><small>${c.n}</small></div>`).join("");
+  document.getElementById("menu").innerHTML=cats.slice(0,9).map(c=>`<li><a tabindex="0" role="button" data-d="${c.nome}" onclick="showDept('${c.nome.replace(/'/g,"\\'")}') " onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">${c.nome}</a></li>`).join("");
   document.getElementById("catsel").innerHTML=cats.map(c=>`<option value="${c.nome}">${c.emoji} ${c.nome} (${c.n})</option>`).join("");
-  document.getElementById("sizes").innerHTML=SIZES.map(s=>`<div class="sz" tabindex="0" role="button" onclick="pickSize(this,'${s}')">${s}</div>`).join("");
+  document.getElementById("sizes").innerHTML=SIZES.map(s=>`<div class="sz" tabindex="0" role="button" onclick="pickSize(this,'${s}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">${s}</div>`).join("");
   window.pickSize=(el,s)=>{const on=el.classList.contains("on");document.querySelectorAll(".sz").forEach(x=>x.classList.remove("on"));if(!on){el.classList.add("on");sz=s;}else sz="";apply();};
   document.getElementById("more").onclick=()=>paint(false);
   let deb; document.getElementById("q").addEventListener("input",e=>{clearTimeout(deb);deb=setTimeout(()=>search(e.target.value),180);});
@@ -451,5 +546,11 @@
 
   let toastT; window.toast=(m)=>{const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),1600);};
   document.addEventListener("keydown",e=>{if(e.key==="Escape")closeCart();});
+  renderPagamentos();
   updateCart(); // restaura badge/itens do localStorage
+
+  // PWA: registra o service worker (só https/produção; falha silenciosa em file://)
+  if("serviceWorker" in navigator){
+    window.addEventListener("load",()=>{navigator.serviceWorker.register("/sw.js").catch(()=>{});});
+  }
 </script>

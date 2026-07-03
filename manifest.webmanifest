@@ -1,0 +1,20 @@
+{
+  "id": "/02-loja-pratica.html",
+  "name": "Lira Fraldas — Loja",
+  "short_name": "Lira Fraldas",
+  "description": "Fraldas e cosméticos em Fortaleza. Monte seu pedido e finalize no WhatsApp.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "/02-loja-pratica.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#33A98F",
+  "categories": ["shopping"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
