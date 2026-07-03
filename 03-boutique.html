@@ -1,0 +1,235 @@
+<title>Lira Fraldas — Boutique</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  /* ============ Template C — "Boutique Premium" (ref: Corujita) ============
+     Posicionamento sofisticado: creme + serifada editorial, muito respiro.
+     Direção pedida pelo cliente (referência Corujita). Mundo claro, elegante. */
+  :root{
+    --cream:#F7F2EA; --paper:#FCFAF6; --sand:#EDE4D6; --taupe:#E3D7C4;
+    --espresso:#2C2620; --ink:#3D362D; --muted:#8B8072;
+    --blush:#C99A93; --blush-deep:#B07F78; --gold:#B0996E;
+    --wa:#1F8A57; --wa-deep:#166B43;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --sans:"Avenir Next","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--sans);color:var(--ink);background:var(--cream);line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 26px}
+  .eyebrow{font-family:var(--sans);font-size:11px;letter-spacing:3.5px;text-transform:uppercase;color:var(--gold);font-weight:600}
+  h1,h2,h3{font-family:var(--serif);font-weight:500;letter-spacing:.2px}
+
+  /* Announce + header */
+  .announce{background:var(--espresso);color:var(--cream);text-align:center;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:9px}
+  header{position:sticky;top:0;z-index:40;background:rgba(247,242,234,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--taupe)}
+  .hbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:20px 0}
+  nav.left ul,nav.right ul{list-style:none;display:flex;gap:26px;margin:0;padding:0}
+  nav a{font-size:12.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink);font-weight:500}
+  nav a:hover{color:var(--blush-deep)}
+  nav.right ul{justify-content:flex-end}
+  .brand{text-align:center;font-family:var(--serif);font-size:26px;letter-spacing:4px;text-transform:uppercase}
+  .brand small{display:block;font-family:var(--sans);font-size:9px;letter-spacing:4px;color:var(--gold);margin-top:2px}
+  .hicons{display:none}
+
+  /* Hero */
+  .hero{position:relative;min-height:78vh;display:flex;align-items:center;overflow:hidden}
+  .hero-bg{position:absolute;inset:0;background:
+      radial-gradient(60% 80% at 78% 30%,rgba(201,154,147,.35),transparent 70%),
+      linear-gradient(135deg,#F0E6D7 0%,#E7D9C6 45%,#D9C3B4 100%)}
+  .hero-bg::after{content:"👶";position:absolute;right:6%;bottom:-4%;font-size:min(46vw,440px);opacity:.16;transform:rotate(-6deg)}
+  .hero-in{position:relative;max-width:600px}
+  .hero .eyebrow{margin-bottom:20px}
+  .hero h1{font-size:clamp(40px,6.5vw,74px);line-height:1.02;margin:0 0 20px;color:var(--espresso);text-wrap:balance}
+  .hero h1 em{font-style:italic;color:var(--blush-deep)}
+  .hero p{font-size:17px;color:var(--ink);max-width:40ch;margin:0 0 32px}
+  .btn{display:inline-block;font-family:var(--sans);font-size:12px;letter-spacing:2.5px;text-transform:uppercase;font-weight:600;padding:16px 34px;border:1px solid var(--espresso);color:var(--espresso);background:transparent;cursor:pointer;transition:.25s}
+  .btn:hover{background:var(--espresso);color:var(--cream)}
+  .btn.solid{background:var(--espresso);color:var(--cream)}
+  .btn.solid:hover{background:transparent;color:var(--espresso)}
+
+  /* Section frame */
+  section{padding:84px 0}
+  .center{text-align:center;max-width:640px;margin:0 auto 52px}
+  .center .eyebrow{display:block;margin-bottom:14px}
+  .center h2{font-size:clamp(28px,4vw,40px);margin:0;color:var(--espresso);text-wrap:balance}
+  .center p{color:var(--muted);margin:14px 0 0;font-size:16px}
+  .rule{width:44px;height:1px;background:var(--gold);margin:16px auto 0}
+
+  /* Categorias — editorial */
+  .cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+  .cat{position:relative;aspect-ratio:3/4;border-radius:2px;overflow:hidden;display:flex;align-items:flex-end;padding:22px;cursor:pointer;background:var(--sand)}
+  .cat .g{position:absolute;inset:0;display:grid;place-items:center;font-size:74px;opacity:.5;transition:.4s}
+  .cat:hover .g{transform:scale(1.08)}
+  .cat::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(44,38,32,.55),transparent 55%)}
+  .cat .lab{position:relative;z-index:1;color:#fff}
+  .cat .lab b{font-family:var(--serif);font-size:20px;font-weight:500;display:block}
+  .cat .lab span{font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.85}
+
+  /* Nova coleção band */
+  .band{background:var(--paper)}
+  .prods{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+  .prod{cursor:pointer;text-align:center}
+  .prod .frame{position:relative;aspect-ratio:4/5;background:linear-gradient(160deg,var(--cream),var(--sand));display:grid;place-items:center;font-size:76px;margin-bottom:16px;overflow:hidden}
+  .prod .frame .tag{position:absolute;top:14px;left:14px;background:var(--paper);color:var(--espresso);font-family:var(--sans);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:5px 11px;font-weight:600}
+  .prod:hover .frame{box-shadow:inset 0 0 0 1px var(--gold)}
+  .prod h3{font-size:17px;margin:0 0 4px;color:var(--espresso);font-weight:500}
+  .prod .price{font-family:var(--sans);font-size:15px;color:var(--ink);letter-spacing:.3px}
+  .prod .buy{margin-top:12px;width:100%;background:transparent;border:1px solid var(--espresso);color:var(--espresso);font-family:var(--sans);font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:600;padding:12px;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+  .prod .buy:hover{background:var(--wa);border-color:var(--wa);color:#fff}
+
+  /* Editorial split */
+  .split{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:0;min-height:520px}
+  .split .img{background:radial-gradient(70% 90% at 40% 30%,rgba(201,154,147,.4),transparent),linear-gradient(140deg,#E7D9C6,#D3BBA9);display:grid;place-items:center;font-size:170px;opacity:.9;min-height:520px}
+  .split .txt{padding:0 clamp(20px,6vw,90px)}
+  .split .eyebrow{display:block;margin-bottom:16px}
+  .split h2{font-size:clamp(28px,3.6vw,42px);margin:0 0 20px;color:var(--espresso);line-height:1.1}
+  .split p{color:var(--ink);font-size:16px;margin:0 0 28px;max-width:44ch}
+
+  /* Values */
+  .vals{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;text-align:center}
+  .val .e{font-size:30px}
+  .val h3{font-size:19px;margin:14px 0 6px;color:var(--espresso)}
+  .val p{color:var(--muted);font-size:14px;margin:0}
+
+  /* Footer */
+  footer{background:var(--espresso);color:var(--cream);padding:70px 0 28px}
+  .fbrand{font-family:var(--serif);font-size:24px;letter-spacing:4px;text-transform:uppercase;text-align:center;margin-bottom:8px}
+  .ftag{text-align:center;color:#c9bca8;font-size:14px;max-width:38ch;margin:0 auto 40px}
+  .fcols{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;border-top:1px solid #4a4137;padding-top:36px}
+  footer h4{font-family:var(--sans);color:#e6dccb;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:0 0 14px}
+  footer a{display:block;color:#b7ab97;font-size:14px;padding:5px 0}
+  footer a:hover{color:#fff}
+  .fbottom{border-top:1px solid #4a4137;margin-top:36px;padding-top:20px;text-align:center;font-size:12px;color:#94886f;letter-spacing:.5px}
+
+  .float{position:fixed;right:22px;bottom:22px;z-index:50;background:var(--wa);color:#fff;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:26px;box-shadow:0 10px 26px rgba(31,138,87,.4);cursor:pointer;transition:.2s}
+  .float:hover{transform:translateY(-3px)}
+
+  @media(max-width:960px){
+    .cat-grid,.prods{grid-template-columns:repeat(2,1fr)}
+    .vals{grid-template-columns:1fr;gap:28px}
+    .split{grid-template-columns:1fr}.split .img{min-height:340px;font-size:120px;order:-1}
+    .split .txt{padding:44px 26px}
+  }
+  @media(max-width:760px){
+    nav.left,nav.right{display:none}
+    .hbar{grid-template-columns:1fr auto 1fr}
+    .hicons{display:flex;justify-content:flex-end;gap:18px;font-size:18px}
+    .hbar .brand{grid-column:1/2;text-align:left}
+    .fcols{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:480px){
+    .cat-grid,.prods{grid-template-columns:1fr}
+    .fcols{grid-template-columns:1fr}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="announce">Enxoval completo com curadoria — atendimento exclusivo no WhatsApp</div>
+
+<header>
+  <div class="wrap hbar">
+    <nav class="left"><ul>
+      <li><a href="#cat">Categorias</a></li><li><a href="#colecao">Coleção</a></li><li><a href="#sobre">A marca</a></li>
+    </ul></nav>
+    <a class="brand">Lira<small>Fraldas · Bebê</small></a>
+    <nav class="right"><ul>
+      <li><a href="#">Buscar</a></li><li><a href="#">Conta</a></li><li><a href="#">Sacola (0)</a></li>
+    </ul></nav>
+    <div class="hicons">🔍 👜</div>
+  </div>
+</header>
+
+<section class="hero" style="padding:0">
+  <div class="hero-bg"></div>
+  <div class="wrap"><div class="hero-in">
+    <span class="eyebrow">Nova estação · 2026</span>
+    <h1>A infância merece o <em>melhor começo</em>.</h1>
+    <p>Fraldas, enxoval e cuidados escolhidos a dedo para o seu bebê — com o carinho de quem entende de mãe.</p>
+    <a class="btn solid" href="#colecao">Descobrir a coleção</a>
+  </div></div>
+</section>
+
+<section id="cat">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow">Universo Lira</span>
+      <h2>Explore por categoria</h2>
+      <div class="rule"></div>
+    </div>
+    <div class="cat-grid" id="cats"></div>
+  </div>
+</section>
+
+<section class="band" id="colecao">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow">Seleção da casa</span>
+      <h2>Essenciais do enxoval</h2>
+      <p>As peças e itens que não podem faltar nos primeiros meses.</p>
+    </div>
+    <div class="prods" id="prods"></div>
+    <div style="text-align:center;margin-top:52px"><a class="btn" href="#">Ver tudo</a></div>
+  </div>
+</section>
+
+<section style="padding:0" id="sobre">
+  <div class="split">
+    <div class="txt">
+      <span class="eyebrow">A marca</span>
+      <h2>Curadoria de mãe para mãe.</h2>
+      <p>A Lira nasceu para descomplicar os primeiros anos: só o que é bom fica na prateleira, e você conta com a gente pra escolher cada item pelo WhatsApp.</p>
+      <a class="btn solid" onclick="pedirGeral()">Falar com a Lira</a>
+    </div>
+    <div class="img">🕊️</div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap vals">
+    <div class="val"><div class="e">🎀</div><h3>Curadoria de verdade</h3><p>Só marcas em que confiaríamos para o nosso bebê.</p></div>
+    <div class="val"><div class="e">💬</div><h3>Atendimento próximo</h3><p>Uma conversa no WhatsApp resolve a sua dúvida.</p></div>
+    <div class="val"><div class="e">🚚</div><h3>Entrega cuidadosa</h3><p>Fortaleza no mesmo dia, embalado com carinho.</p></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="fbrand">Lira Fraldas</div>
+    <p class="ftag">Boutique de fraldas, enxoval e cuidados para o seu bebê. Fortaleza/CE.</p>
+    <div class="fcols">
+      <div><h4>Navegar</h4><a href="#">Início</a><a href="#">Categorias</a><a href="#">Coleção</a><a href="#">A marca</a></div>
+      <div><h4>Ajuda</h4><a href="#">Trocas & devoluções</a><a href="#">Formas de pagamento</a><a href="#">Entrega</a></div>
+      <div><h4>Contato</h4><a href="#">WhatsApp</a><a href="#">@lira_fraldas</a><a href="#">Nossa loja</a></div>
+      <div><h4>Newsletter</h4><a href="#">Receba lançamentos e mimos exclusivos.</a></div>
+    </div>
+    <div class="fbottom">© 2026 Lira Fraldas — Virginia L Almada Comércio Varejista LTDA · CNPJ 59.321.753/0001-41 · Desenvolvido pela Audex</div>
+  </div>
+</footer>
+
+<a class="float" onclick="pedirGeral()" title="Falar no WhatsApp">💬</a>
+
+<script>
+  // TODO: trocar pelo WhatsApp real da Lira Fraldas
+  const WA="5585999999999";
+  function pedir(nome,preco){
+    const t=`Olá, Lira Fraldas! Tenho interesse em: *${nome}* (${preco}). Poderia me atender?`;
+    window.open(`https://wa.me/${WA}?text=`+encodeURIComponent(t),"_blank");
+  }
+  function pedirGeral(){window.open(`https://wa.me/${WA}?text=`+encodeURIComponent("Olá, Lira Fraldas! Gostaria de ser atendida."),"_blank");}
+
+  const CATS=[["🧷","Fraldas","Do RN ao XXG"],["🛏️","Enxoval","Berço & quarto"],["👶","Roupinhas","Primeiros meses"],["🛁","Cuidados","Banho & higiene"]];
+  const PRODS=[
+    ["🧷","Fralda Premium Care","Pampers · Tam. M","R$ 59,90","Best-seller"],
+    ["🧴","Kit Cuidados Bebê","Mustela · 3 peças","R$ 129,90","Curadoria"],
+    ["🍼","Mamadeira Anti-cólica","Philips Avent · 260ml","R$ 44,90",""],
+    ["🧸","Naninha de Algodão","Zip Toys · Off-white","R$ 69,90","Novidade"]
+  ];
+
+  document.getElementById("cats").innerHTML=CATS.map(c=>`<div class="cat"><span class="g">${c[0]}</span><span class="lab"><b>${c[1]}</b><span>${c[2]}</span></span></div>`).join("");
+  document.getElementById("prods").innerHTML=PRODS.map(x=>`<article class="prod">
+    <div class="frame">${x[4]?`<span class="tag">${x[4]}</span>`:""}${x[0]}</div>
+    <h3>${x[1]}</h3>
+    <div class="price">${x[2]} — <b>${x[3]}</b></div>
+    <button class="buy" onclick="pedir('${x[1].replace(/'/g,"")}','${x[3]}')">💬 Pedir no WhatsApp</button>
+  </article>`).join("");
+</script>

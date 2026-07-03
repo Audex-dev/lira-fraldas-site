@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Lira Fraldas — Escolha o estilo do site</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<style>
+  :root{
+    --coral:#FF6A45; --teal:#12B3A6; --gold:#B0996E;
+    --cream:#FBF6F0; --card:#FFFFFF; --ink:#2A211C; --muted:#8A7A70; --line:#EEE2D8;
+    --font:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--font);color:var(--ink);background:
+    radial-gradient(60% 50% at 10% 0%,#FFEFE8,transparent 60%),
+    radial-gradient(60% 50% at 100% 10%,#E6F7F5,transparent 60%),var(--cream);line-height:1.5;min-height:100vh}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  header{text-align:center;padding:56px 20px 30px}
+  .logo{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--coral),var(--teal));display:grid;place-items:center;font-size:34px;margin:0 auto 18px;box-shadow:0 10px 26px rgba(255,106,69,.25)}
+  header h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,5vw,42px);margin:0 0 10px;letter-spacing:-.3px}
+  header p{color:var(--muted);font-size:17px;max-width:52ch;margin:0 auto}
+  .eyebrow{font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:14px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;padding:20px 0 30px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:inherit;transition:.18s;box-shadow:0 6px 18px rgba(0,0,0,.04)}
+  .card:hover{transform:translateY(-5px);box-shadow:0 16px 36px rgba(0,0,0,.10)}
+  .thumb{height:150px;display:grid;place-items:center;font-size:56px;position:relative}
+  .thumb .pill{position:absolute;top:12px;left:12px;background:rgba(255,255,255,.92);color:var(--ink);font-size:11px;font-weight:800;letter-spacing:.5px;padding:4px 10px;border-radius:999px}
+  .t-a{background:linear-gradient(135deg,#FFD9CB,#FFB59B)}
+  .t-b{background:linear-gradient(135deg,#CDEFEB,#A6E3DC)}
+  .t-c{background:linear-gradient(135deg,#EFE4D3,#E1CDBB)}
+  .body{padding:20px;display:flex;flex-direction:column;flex:1}
+  .body h2{font-size:19px;margin:0 0 4px}
+  .ref{font-size:12px;color:var(--muted);margin:0 0 10px}
+  .body p{font-size:14px;color:var(--muted);margin:0 0 16px;flex:1}
+  .open{align-self:flex-start;font-weight:800;font-size:14px;color:var(--coral)}
+  .card.b .open{color:var(--teal)} .card.c .open{color:var(--gold)}
+  .note{text-align:center;color:var(--muted);font-size:13px;padding:0 20px 50px;max-width:60ch;margin:0 auto}
+  .note b{color:var(--ink)}
+  footer{text-align:center;color:var(--muted);font-size:12px;padding:24px;border-top:1px solid var(--line)}
+  @media(max-width:820px){.grid{grid-template-columns:1fr;max-width:420px;margin:0 auto}}
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo">🍼</div>
+    <div class="eyebrow">Lira Fraldas × Audex</div>
+    <h1>Escolha o estilo do seu site</h1>
+    <p>Preparamos 3 direções visuais a partir das referências que você enviou. Toque em cada uma para ver a home completa no seu celular — todos já têm pedido pelo WhatsApp.</p>
+  </header>
+
+  <div class="wrap">
+    <div class="grid">
+      <a class="card a" href="./01-mercadao.html">
+        <div class="thumb t-a"><span class="pill">Opção A</span>🛒</div>
+        <div class="body">
+          <h2>Loja Completa</h2>
+          <p class="ref">Referência: R Center</p>
+          <p>Vitrine cheia de ofertas, busca no topo e muitas categorias. Ideal para vender bastante variedade com preço em destaque.</p>
+          <span class="open">Ver essa opção →</span>
+        </div>
+      </a>
+      <a class="card b" href="./02-loja-pratica.html">
+        <div class="thumb t-b"><span class="pill">Opção B</span>🧸</div>
+        <div class="body">
+          <h2>Loja Infantil Prática</h2>
+          <p class="ref">Referência: Senhor Pandinha</p>
+          <p>Clean e fácil de usar, com filtro por tamanho de fralda e marca. O equilíbrio entre bonito e prático.</p>
+          <span class="open">Ver essa opção →</span>
+        </div>
+      </a>
+      <a class="card c" href="./03-boutique.html">
+        <div class="thumb t-c"><span class="pill">Opção C</span>🎀</div>
+        <div class="body">
+          <h2>Boutique Premium</h2>
+          <p class="ref">Referência: Corujita</p>
+          <p>Sofisticado e elegante, com cara de curadoria. Passa valor e posiciona a marca no topo.</p>
+          <span class="open">Ver essa opção →</span>
+        </div>
+      </a>
+    </div>
+    <p class="note">São <b>demonstrações visuais</b> — cores, textos e fotos são exemplos e serão trocados pela identidade real da Lira. Depois que você escolher uma direção, montamos a loja de verdade.</p>
+  </div>
+
+  <footer>Desenvolvido pela Audex • demonstração para Lira Fraldas</footer>
+</body>
+</html>

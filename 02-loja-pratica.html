@@ -1,0 +1,264 @@
+<title>Lira Fraldas — Loja Prática</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  /* ============ Template B — "Loja Prática" (ref: Senhor Pandinha) ============
+     E-commerce infantil funcional: busca + WhatsApp + carrinho no topo,
+     filtro por tamanho, grade limpa. Paleta teal/menta + blush, mundo claro. */
+  :root{
+    --teal:#12B3A6; --teal-deep:#0A8E84; --teal-soft:#E7F7F5;
+    --blush:#FF8FA6; --blush-deep:#F26A87;
+    --bg:#FFFFFF; --panel:#F5FBFA; --ink:#123A38; --muted:#6E8B88;
+    --line:#E1EFED; --wa:#25D366; --wa-deep:#1EA955;
+    --r:14px; --shadow:0 8px 22px rgba(10,142,132,.10);
+    --font:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.5}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 18px}
+
+  /* Header */
+  .top{background:var(--teal-deep);color:#fff;font-size:13px;font-weight:600;text-align:center;padding:8px}
+  header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,var(--teal),var(--teal-deep));color:#fff}
+  .hbar{display:flex;align-items:center;gap:20px;padding:16px 0}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:23px;letter-spacing:-.4px;white-space:nowrap}
+  .logo{width:44px;height:44px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+  .search{flex:1;display:flex;background:#fff;border-radius:999px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.10)}
+  .search input{flex:1;border:0;padding:13px 18px;font-size:15px;outline:none;color:var(--ink)}
+  .search button{border:0;background:var(--blush);color:#fff;padding:0 22px;font-size:17px;cursor:pointer}
+  .hact{display:flex;align-items:center;gap:18px}
+  .hlink{display:flex;align-items:center;gap:9px;font-weight:600;font-size:14px;cursor:pointer}
+  .hlink .ic{font-size:22px}
+  .hlink small{opacity:.85;font-weight:500;font-size:12px;display:block}
+  .cartn{background:var(--blush);color:#fff;font-size:11px;font-weight:800;border-radius:999px;padding:1px 7px;margin-left:2px}
+  nav.menu{background:var(--teal-deep);border-top:1px solid rgba(255,255,255,.12)}
+  .menu ul{list-style:none;display:flex;gap:4px;margin:0;padding:0;overflow-x:auto;scrollbar-width:none}
+  .menu ul::-webkit-scrollbar{display:none}
+  .menu a{display:block;padding:12px 16px;font-weight:600;font-size:14px;color:#eafffb;white-space:nowrap}
+  .menu a:hover{background:rgba(255,255,255,.12)}
+
+  /* Hero */
+  .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;margin:26px 0;align-items:stretch}
+  .hcard{border-radius:22px;padding:40px;color:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;min-height:260px;background:radial-gradient(130% 120% at 0 100%,var(--blush) 0%,var(--teal) 60%)}
+  .hcard .kk{font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;opacity:.9;margin-bottom:12px}
+  .hcard h1{margin:0 0 14px;font-size:38px;line-height:1.05;letter-spacing:-.6px;text-wrap:balance}
+  .hcard p{margin:0 0 22px;font-size:16px;opacity:.95;max-width:32ch}
+  .hcard .cta{align-self:flex-start;background:#fff;color:var(--teal-deep);font-weight:800;padding:14px 26px;border-radius:999px;font-size:15px}
+  .hcard .blob{position:absolute;right:-20px;bottom:-30px;font-size:150px;opacity:.2;transform:rotate(8deg)}
+  .hside{display:grid;grid-template-rows:1fr 1fr;gap:22px}
+  .mini{border-radius:18px;padding:24px;display:flex;flex-direction:column;justify-content:center;background:var(--panel);border:1px solid var(--line)}
+  .mini h3{margin:0 0 4px;font-size:19px}
+  .mini p{margin:0;color:var(--muted);font-size:14px}
+  .mini.b{background:var(--teal-soft)}
+  .mini .cta2{margin-top:10px;color:var(--teal-deep);font-weight:800;font-size:14px}
+
+  /* Category tiles */
+  .catsec{margin:40px 0}
+  .catsec h2{font-size:24px;margin:0 0 4px;letter-spacing:-.3px}
+  .sub{color:var(--muted);margin:0 0 18px;font-size:15px}
+  .cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:14px}
+  .cat{text-align:center;cursor:pointer}
+  .cat .disc{aspect-ratio:1;border-radius:50%;background:var(--teal-soft);display:grid;place-items:center;font-size:42px;transition:.15s;border:2px solid transparent}
+  .cat:hover .disc{border-color:var(--teal);transform:translateY(-3px);box-shadow:var(--shadow)}
+  .cat b{display:block;margin-top:10px;font-size:14px;font-weight:600}
+
+  /* Listing */
+  .listing{display:grid;grid-template-columns:230px 1fr;gap:26px;margin:40px 0}
+  .filters{align-self:start;position:sticky;top:150px}
+  .fbox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:16px}
+  .fbox h4{margin:0 0 12px;font-size:15px;letter-spacing:.2px}
+  .sizes{display:flex;flex-wrap:wrap;gap:8px}
+  .sz{border:1.5px solid var(--line);background:#fff;border-radius:9px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;transition:.15s}
+  .sz:hover,.sz.on{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-deep)}
+  .frow{display:flex;align-items:center;gap:9px;padding:6px 0;font-size:14px;cursor:pointer}
+  .frow input{accent-color:var(--teal);width:16px;height:16px}
+  .lhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .lhead h2{margin:0;font-size:22px}
+  .lhead .count{color:var(--muted);font-size:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+  .prod{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column;transition:.15s;position:relative}
+  .prod:hover{box-shadow:var(--shadow);transform:translateY(-3px)}
+  .tag{position:absolute;top:12px;left:12px;background:var(--blush);color:#fff;font-size:11px;font-weight:800;border-radius:7px;padding:3px 9px;letter-spacing:.3px}
+  .pimg{aspect-ratio:1;display:grid;place-items:center;font-size:64px;background:linear-gradient(135deg,var(--teal-soft),#FFF0F3)}
+  .pbody{padding:14px;display:flex;flex-direction:column;flex:1}
+  .pcat{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--teal-deep);font-weight:800;margin-bottom:5px}
+  .pname{font-size:14px;font-weight:600;line-height:1.35;min-height:38px;margin-bottom:8px}
+  .price{font-size:21px;font-weight:800;color:var(--ink);letter-spacing:-.4px}
+  .parc{font-size:12px;color:var(--muted);margin:2px 0 12px}
+  .buy{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--wa);color:#fff;font-weight:700;font-size:14px;border:0;border-radius:10px;padding:11px;cursor:pointer;transition:.15s}
+  .buy:hover{background:var(--wa-deep)}
+
+  /* Newsletter */
+  .news{background:var(--teal-soft);border-radius:22px;padding:38px;text-align:center;margin:44px 0}
+  .news h2{margin:0 0 6px;font-size:26px}
+  .news p{margin:0 0 20px;color:var(--muted)}
+  .nform{display:flex;gap:10px;max-width:460px;margin:0 auto}
+  .nform input{flex:1;border:1.5px solid var(--line);border-radius:999px;padding:13px 18px;font-size:15px;outline:none}
+  .nform input:focus{border-color:var(--teal)}
+  .nform button{background:var(--teal);color:#fff;border:0;border-radius:999px;padding:0 26px;font-weight:800;cursor:pointer}
+
+  /* Footer */
+  footer{background:#0E2E2C;color:#cfe4e1;margin-top:20px;padding:44px 0 22px}
+  .fcols{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:26px}
+  footer h4{color:#fff;font-size:14px;margin:0 0 12px}
+  footer a{display:block;color:#a9c7c3;font-size:14px;padding:4px 0}
+  footer a:hover{color:#fff}
+  .fbrand{font-weight:800;font-size:20px;color:#fff;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .fnote{font-size:13px;color:#8fb0ac;max-width:32ch}
+  .fbottom{border-top:1px solid #1f4b47;margin-top:26px;padding-top:16px;font-size:12px;color:#7fa19d;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+  .float{position:fixed;right:18px;bottom:18px;z-index:50;background:var(--wa);color:#fff;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-size:28px;box-shadow:0 8px 24px rgba(37,211,102,.45);cursor:pointer;transition:.15s}
+  .float:hover{transform:scale(1.06)}
+
+  @media(max-width:900px){
+    .hero{grid-template-columns:1fr}.hside{grid-template-rows:none;grid-template-columns:1fr 1fr}
+    .listing{grid-template-columns:1fr}.filters{position:static}
+    .filters{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .fcols{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:640px){
+    .hact .txt{display:none}.hcard h1{font-size:30px}
+    .hside{grid-template-columns:1fr}.filters{grid-template-columns:1fr}
+    .search{order:3;flex:1 0 100%}.hbar{flex-wrap:wrap;gap:14px}
+    .fcols{grid-template-columns:1fr}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="top">💚 Atendimento humano no WhatsApp — tire dúvidas e monte seu enxoval com a gente</div>
+
+<header>
+  <div class="wrap hbar">
+    <a class="brand"><span class="logo">🍼</span> Lira Fraldas</a>
+    <form class="search" onsubmit="return false">
+      <input placeholder="O que você está buscando?" aria-label="Buscar">
+      <button aria-label="Buscar">🔍</button>
+    </form>
+    <div class="hact">
+      <div class="hlink"><span class="ic">👤</span><span class="txt"><small>Olá!</small>Entrar</span></div>
+      <div class="hlink"><span class="ic">🛒</span><span class="txt">Carrinho<span class="cartn">0</span></span></div>
+    </div>
+  </div>
+  <nav class="menu"><div class="wrap"><ul>
+    <li><a href="#">Início</a></li><li><a href="#">Fraldas</a></li><li><a href="#">Lenços umedecidos</a></li>
+    <li><a href="#">Higiene & banho</a></li><li><a href="#">Papinhas</a></li><li><a href="#">Roupinhas</a></li>
+    <li><a href="#">Enxoval</a></li><li><a href="#">Brinquedos</a></li><li><a href="#">Ofertas</a></li>
+  </ul></div></nav>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="hcard">
+      <div class="kk">Bem-vinda à Lira</div>
+      <h1>Tudo pro seu bebê num lugar só.</h1>
+      <p>Fraldas, higiene, enxoval e mais — com atendimento de verdade pelo WhatsApp.</p>
+      <a class="cta" href="#produtos">Comprar agora →</a>
+      <span class="blob">👶</span>
+    </div>
+    <div class="hside">
+      <div class="mini b"><h3>🧷 Fraldas por assinatura</h3><p>Receba todo mês sem esquecer.</p><span class="cta2">Saiba mais →</span></div>
+      <div class="mini"><h3>🎁 Monte seu enxoval</h3><p>A gente ajuda item por item.</p><span class="cta2">Falar no WhatsApp →</span></div>
+    </div>
+  </div>
+
+  <section class="catsec">
+    <h2>Compre por categoria</h2>
+    <p class="sub">Encontre rápido o que o seu bebê precisa</p>
+    <div class="cats" id="cats"></div>
+  </section>
+
+  <div class="listing" id="produtos">
+    <aside class="filters">
+      <div class="fbox">
+        <h4>Tamanho da fralda</h4>
+        <div class="sizes" id="sizes"></div>
+      </div>
+      <div class="fbox">
+        <h4>Marca</h4>
+        <label class="frow"><input type="checkbox">Pampers</label>
+        <label class="frow"><input type="checkbox">Huggies</label>
+        <label class="frow"><input type="checkbox">MamyPoko</label>
+        <label class="frow"><input type="checkbox">Personal</label>
+        <label class="frow"><input type="checkbox">Pom Pom</label>
+      </div>
+      <div class="fbox">
+        <h4>Preço</h4>
+        <label class="frow"><input type="checkbox">Até R$ 40</label>
+        <label class="frow"><input type="checkbox">R$ 40 a R$ 80</label>
+        <label class="frow"><input type="checkbox">Acima de R$ 80</label>
+      </div>
+    </aside>
+    <div>
+      <div class="lhead"><h2>Fraldas & cuidados</h2><span class="count">36 produtos</span></div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+
+  <section class="news">
+    <h2>Ganhe 10% na primeira compra</h2>
+    <p>Cadastre seu e-mail e receba ofertas exclusivas pra mamães e papais.</p>
+    <form class="nform" onsubmit="return false">
+      <input placeholder="Seu melhor e-mail" aria-label="E-mail">
+      <button>Quero desconto</button>
+    </form>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="fcols">
+      <div>
+        <div class="fbrand"><span class="logo" style="width:34px;height:34px;font-size:18px">🍼</span> Lira Fraldas</div>
+        <p class="fnote">Loja de fraldas e produtos infantis em Fortaleza/CE. Atendimento humano no WhatsApp.</p>
+      </div>
+      <div><h4>Departamentos</h4><a href="#">Fraldas</a><a href="#">Higiene & banho</a><a href="#">Papinhas</a><a href="#">Roupinhas</a></div>
+      <div><h4>Ajuda</h4><a href="#">Quem somos</a><a href="#">Trocas e devoluções</a><a href="#">Formas de pagamento</a><a href="#">Fale conosco</a></div>
+      <div><h4>Contato</h4><a href="#">💬 WhatsApp</a><a href="#">📷 @lira_fraldas</a><a href="#">📍 Fortaleza/CE</a></div>
+    </div>
+    <div class="fbottom">
+      <span>© 2026 Lira Fraldas — Virginia L Almada Comércio Varejista LTDA • CNPJ 59.321.753/0001-41</span>
+      <span>Desenvolvido pela Audex</span>
+    </div>
+  </div>
+</footer>
+
+<a class="float" onclick="pedirGeral()" title="Falar no WhatsApp">💬</a>
+
+<script>
+  // TODO: trocar pelo WhatsApp real da Lira Fraldas
+  const WA="5585999999999";
+  function pedir(nome,preco){
+    const t=`Olá, Lira Fraldas! 👋 Tenho interesse em: *${nome}* (${preco}). Pode me ajudar?`;
+    window.open(`https://wa.me/${WA}?text=`+encodeURIComponent(t),"_blank");
+  }
+  function pedirGeral(){window.open(`https://wa.me/${WA}?text=`+encodeURIComponent("Olá, Lira Fraldas! Gostaria de tirar uma dúvida / fazer um pedido."),"_blank");}
+
+  const CATS=[["🧷","Fraldas"],["🧻","Lenços umedecidos"],["🛁","Higiene & banho"],["🧴","Pomadas"],["🥣","Papinhas"],["🍼","Mamadeiras"],["👶","Roupinhas"],["🧸","Brinquedos"]];
+  const SIZES=["RN","P","M","G","GG","XG","XXG"];
+  const P=(e,c,n,p,parc,tag)=>({e,c,n,p,parc,tag});
+  const PRODS=[
+    P("🧷","Fraldas","Fralda Pampers Premium Care M 74un","R$ 59,90","3x R$ 19,97","Mais vendida"),
+    P("🧷","Fraldas","Fralda Huggies Supreme G 68un","R$ 74,90","4x R$ 18,72",""),
+    P("🧻","Lenços","Lenço Umedecido Huggies 3x96un","R$ 32,90","","Combo"),
+    P("🧴","Pomadas","Pomada Bepantol Baby 120g","R$ 39,90","",""),
+    P("🧷","Fraldas","Fralda MamyPoko Premium XG 60un","R$ 69,90","3x R$ 23,30",""),
+    P("🛁","Higiene","Kit Banho Johnson's Recém-nascido","R$ 54,90","","Enxoval"),
+    P("🥣","Papinhas","Papinha Nestlé 6 sabores","R$ 27,90","",""),
+    P("🍼","Mamadeiras","Mamadeira Avent Anti-cólica 260ml","R$ 44,90","2x R$ 22,45","")
+  ];
+
+  document.getElementById("cats").innerHTML=CATS.map(c=>`<div class="cat"><div class="disc">${c[0]}</div><b>${c[1]}</b></div>`).join("");
+  document.getElementById("sizes").innerHTML=SIZES.map((s,i)=>`<div class="sz${i===2?' on':''}">${s}</div>`).join("");
+  document.getElementById("grid").innerHTML=PRODS.map(x=>`<article class="prod">
+    ${x.tag?`<span class="tag">${x.tag}</span>`:""}
+    <div class="pimg">${x.e}</div>
+    <div class="pbody">
+      <div class="pcat">${x.c}</div>
+      <div class="pname">${x.n}</div>
+      <div class="price">${x.p}</div>
+      <div class="parc">${x.parc||"à vista no Pix"}</div>
+      <button class="buy" onclick="pedir('${x.n.replace(/'/g,"")}','${x.p}')">💬 Pedir no WhatsApp</button>
+    </div>
+  </article>`).join("");
+  document.querySelectorAll(".sz").forEach(s=>s.onclick=()=>{document.querySelectorAll(".sz").forEach(x=>x.classList.remove("on"));s.classList.add("on")});
+</script>

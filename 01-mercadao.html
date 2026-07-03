@@ -1,0 +1,266 @@
+<title>Lira Fraldas — Loja Completa</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  /* ============ Template A — "Mercadão" (ref: R Center) ============
+     Loja completa, promo-driven, muito SKU, busca central.
+     Paleta: coral/tangerina quente + azul-céu, sobre creme. Compromisso claro
+     com o mundo claro e alegre da marca (single-theme deliberado). */
+  :root{
+    --coral:#FF6A45; --coral-deep:#E8481F; --sky:#2CB6C6; --sky-deep:#1B8C9A;
+    --cream:#FFF6F1; --card:#FFFFFF; --ink:#2A211C; --muted:#8A7A70;
+    --line:#F0E3DA; --wa:#25D366; --wa-deep:#1EA955; --amber:#FFB020;
+    --shadow:0 6px 20px rgba(226,72,31,.10); --r:16px;
+    --font:"Segoe UI Variable","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--font);color:var(--ink);background:var(--cream);line-height:1.45}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 18px}
+  .row{display:flex;align-items:center;gap:14px}
+
+  /* Top strip */
+  .strip{background:linear-gradient(90deg,var(--coral-deep),var(--coral));color:#fff;font-size:13px;font-weight:600;text-align:center;padding:7px 12px;letter-spacing:.2px}
+
+  /* Header + busca */
+  header{position:sticky;top:0;z-index:40;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 2px 10px rgba(0,0,0,.03)}
+  .hbar{display:flex;align-items:center;gap:18px;padding:12px 0}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;letter-spacing:-.5px;white-space:nowrap}
+  .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--coral),var(--sky));display:grid;place-items:center;font-size:22px;box-shadow:var(--shadow)}
+  .search{flex:1;display:flex;align-items:center;background:var(--cream);border:2px solid var(--line);border-radius:999px;padding:0 6px 0 16px;transition:border-color .15s}
+  .search:focus-within{border-color:var(--coral)}
+  .search input{flex:1;border:0;background:none;padding:12px 8px;font-size:15px;color:var(--ink);outline:none}
+  .search button{border:0;background:var(--coral);color:#fff;width:40px;height:40px;border-radius:999px;font-size:17px;cursor:pointer}
+  .hact{display:flex;align-items:center;gap:8px}
+  .icobtn{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-weight:600;font-size:14px;cursor:pointer}
+  .icobtn.cart{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .badge{background:var(--amber);color:#3a2a00;font-size:11px;font-weight:800;border-radius:999px;padding:1px 7px}
+
+  /* Chip rail categorias */
+  .rail{border-bottom:1px solid var(--line);background:var(--card)}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:12px 0;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:9px 15px;border-radius:999px;background:var(--cream);border:1px solid var(--line);font-weight:600;font-size:14px;cursor:pointer;transition:.15s}
+  .chip:hover{background:#fff;border-color:var(--coral);color:var(--coral-deep)}
+  .chip .e{font-size:17px}
+
+  /* Hero promo */
+  .hero{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin:20px 0}
+  .promo{border-radius:20px;padding:34px;color:#fff;position:relative;overflow:hidden;min-height:200px;display:flex;flex-direction:column;justify-content:center}
+  .promo.big{background:radial-gradient(120% 140% at 100% 0%,var(--sky) 0%,var(--coral) 55%,var(--coral-deep) 100%)}
+  .promo.small{background:linear-gradient(160deg,#5B4B8A,#8A6FB0);min-height:0}
+  .promo h1{margin:0 0 8px;font-size:34px;line-height:1.05;letter-spacing:-.5px;text-wrap:balance}
+  .promo p{margin:0 0 18px;font-size:16px;opacity:.95;max-width:34ch}
+  .promo .cta{align-self:flex-start;background:#fff;color:var(--coral-deep);font-weight:800;padding:12px 22px;border-radius:999px;font-size:15px}
+  .promo .kk{font-size:13px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;opacity:.85;margin-bottom:10px}
+  .promo .blob{position:absolute;right:-30px;bottom:-40px;font-size:150px;opacity:.18;transform:rotate(-10deg)}
+  .promo.small h1{font-size:22px}
+
+  /* Section */
+  section{margin:34px 0}
+  .shead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px}
+  .shead h2{margin:0;font-size:22px;letter-spacing:-.3px}
+  .shead a{color:var(--sky-deep);font-weight:700;font-size:14px}
+
+  /* Product cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+  .scroller{display:flex;gap:14px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
+  .scroller::-webkit-scrollbar{display:none}
+  .scroller .prod{flex:0 0 200px}
+  .prod{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;transition:.15s;position:relative}
+  .prod:hover{box-shadow:var(--shadow);transform:translateY(-3px);border-color:#fadfd3}
+  .pimg{aspect-ratio:1;border-radius:12px;display:grid;place-items:center;font-size:56px;margin-bottom:10px;background:linear-gradient(135deg,#FFF0E9,#EAF7F8)}
+  .off{position:absolute;top:16px;left:16px;background:var(--coral-deep);color:#fff;font-size:12px;font-weight:800;border-radius:8px;padding:3px 8px}
+  .pname{font-size:14px;font-weight:600;line-height:1.3;min-height:36px;margin-bottom:6px}
+  .old{font-size:12px;color:var(--muted);text-decoration:line-through}
+  .price{font-size:20px;font-weight:800;color:var(--coral-deep);letter-spacing:-.5px}
+  .price small{font-size:12px;font-weight:700;color:var(--muted);margin-left:2px}
+  .pix{font-size:12px;color:var(--sky-deep);font-weight:600;margin:2px 0 10px}
+  .buy{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--wa);color:#fff;font-weight:700;font-size:14px;border:0;border-radius:10px;padding:11px;cursor:pointer;transition:.15s}
+  .buy:hover{background:var(--wa-deep)}
+
+  /* Category tiles */
+  .cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .cat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 14px;text-align:center;font-weight:700;cursor:pointer;transition:.15s}
+  .cat:hover{border-color:var(--coral);transform:translateY(-2px);box-shadow:var(--shadow)}
+  .cat .e{font-size:40px;display:block;margin-bottom:8px}
+  .cat small{display:block;color:var(--muted);font-weight:600;margin-top:2px}
+
+  /* Trust bar */
+  .trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+  .tr{display:flex;gap:12px;align-items:center}
+  .tr .e{font-size:30px}
+  .tr b{display:block;font-size:14px}
+  .tr span{font-size:13px;color:var(--muted)}
+
+  /* Footer */
+  footer{background:var(--ink);color:#e9ded6;margin-top:40px;padding:40px 0 24px}
+  .fcols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:24px}
+  footer h4{color:#fff;font-size:14px;margin:0 0 12px;letter-spacing:.4px}
+  footer a{display:block;color:#c9bab0;font-size:14px;padding:4px 0}
+  footer a:hover{color:#fff}
+  .fbrand{font-weight:800;font-size:20px;color:#fff;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .fnote{font-size:13px;color:#b3a498;max-width:34ch}
+  .fbottom{border-top:1px solid #46382f;margin-top:28px;padding-top:16px;font-size:12px;color:#9a8b80;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+  /* Float WhatsApp */
+  .float{position:fixed;right:18px;bottom:18px;z-index:50;background:var(--wa);color:#fff;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-size:28px;box-shadow:0 8px 24px rgba(37,211,102,.45);cursor:pointer;transition:.15s}
+  .float:hover{transform:scale(1.06)}
+
+  @media(max-width:820px){
+    .hero{grid-template-columns:1fr}
+    .promo.small{display:none}
+    .hact .lbl{display:none}
+    .brand{font-size:19px}
+    .promo h1{font-size:28px}
+    .fcols{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:560px){
+    .search{order:3;flex:1 0 100%}
+    .hbar{flex-wrap:wrap}
+    .fcols{grid-template-columns:1fr}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="strip">🚚 Frete grátis acima de R$ 149 em Fortaleza • 📦 Retirada na loja em 30min • 💳 Parcele no cartão</div>
+
+<header>
+  <div class="wrap hbar">
+    <a class="brand"><span class="logo">🍼</span> Lira<span style="color:var(--coral)">Fraldas</span></a>
+    <form class="search" onsubmit="return false">
+      <input placeholder="Busque por fralda, marca, tamanho…" aria-label="Buscar produtos">
+      <button aria-label="Buscar">🔍</button>
+    </form>
+    <div class="hact">
+      <button class="icobtn"><span>👤</span><span class="lbl">Entrar</span></button>
+      <button class="icobtn cart"><span>🛒</span><span class="lbl">Carrinho</span> <span class="badge">0</span></button>
+    </div>
+  </div>
+  <div class="rail"><div class="wrap chips" id="chips"></div></div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="promo big">
+      <div class="kk">Semana do bebê</div>
+      <h1>Fralda boa, preço de atacado.</h1>
+      <p>As melhores marcas do RN ao XXG, entregues no mesmo dia em Fortaleza.</p>
+      <a class="cta" href="#ofertas">Ver ofertas →</a>
+      <span class="blob">🧷</span>
+    </div>
+    <div class="promo small">
+      <div class="kk">Clube Lira</div>
+      <h1>Assine e economize 15% todo mês</h1>
+    </div>
+  </div>
+
+  <section id="ofertas">
+    <div class="shead"><h2>🔥 Ofertas do dia</h2><a href="#">Ver todas →</a></div>
+    <div class="scroller" id="ofertas-list"></div>
+  </section>
+
+  <section>
+    <div class="shead"><h2>Navegue por categoria</h2></div>
+    <div class="cats" id="cats"></div>
+  </section>
+
+  <section>
+    <div class="shead"><h2>🧷 Fraldas mais vendidas</h2><a href="#">Ver todas →</a></div>
+    <div class="grid" id="fraldas"></div>
+  </section>
+
+  <section>
+    <div class="trust">
+      <div class="tr"><span class="e">🚚</span><div><b>Entrega no dia</b><span>Fortaleza e região</span></div></div>
+      <div class="tr"><span class="e">💬</span><div><b>Pedido no WhatsApp</b><span>Atendimento humano</span></div></div>
+      <div class="tr"><span class="e">🔒</span><div><b>Pagamento seguro</b><span>Pix, cartão e boleto</span></div></div>
+      <div class="tr"><span class="e">↩️</span><div><b>Troca fácil</b><span>7 dias de garantia</span></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="shead"><h2>🛁 Higiene & cuidados</h2><a href="#">Ver todas →</a></div>
+    <div class="grid" id="higiene"></div>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="fcols">
+      <div>
+        <div class="fbrand"><span class="logo" style="width:34px;height:34px;font-size:18px">🍼</span> Lira Fraldas</div>
+        <p class="fnote">Tudo para o seu bebê, do enxoval ao dia a dia. Loja física e entrega em Fortaleza/CE.</p>
+      </div>
+      <div><h4>Institucional</h4><a href="#">Quem somos</a><a href="#">Nossa loja</a><a href="#">Trocas e devoluções</a><a href="#">Política de privacidade</a></div>
+      <div><h4>Categorias</h4><a href="#">Fraldas</a><a href="#">Lenços umedecidos</a><a href="#">Higiene & banho</a><a href="#">Papinhas</a></div>
+      <div><h4>Atendimento</h4><a href="#">WhatsApp</a><a href="#">@lira_fraldas</a><a href="#">Fale conosco</a></div>
+    </div>
+    <div class="fbottom">
+      <span>© 2026 Lira Fraldas — Virginia L Almada Comércio Varejista LTDA • CNPJ 59.321.753/0001-41</span>
+      <span>Feito pela Audex</span>
+    </div>
+  </div>
+</footer>
+
+<a class="float" onclick="pedirGeral()" title="Falar no WhatsApp">💬</a>
+
+<script>
+  // TODO: trocar pelo WhatsApp real da Lira Fraldas
+  const WA="5585999999999";
+  function pedir(nome,preco){
+    const t=`Olá, Lira Fraldas! 👋 Quero comprar: *${nome}* (${preco}). Ainda tem disponível?`;
+    window.open(`https://wa.me/${WA}?text=`+encodeURIComponent(t),"_blank");
+  }
+  function pedirGeral(){window.open(`https://wa.me/${WA}?text=`+encodeURIComponent("Olá, Lira Fraldas! Gostaria de fazer um pedido."),"_blank");}
+
+  const CATS=[
+    ["🧷","Fraldas","RN ao XXG"],["🧻","Lenços umedecidos","Todas as marcas"],
+    ["🛁","Higiene & banho","Sabonete, shampoo"],["🧴","Pomadas & cuidados","Anti-assadura"],
+    ["🥣","Papinhas","Alimentação"],["🍼","Mamadeiras & chupetas",""],
+    ["👶","Roupinhas","Body, macacão"],["🧸","Brinquedos",""],["🛏️","Enxoval",""]
+  ];
+  const CHIPS=[["🏷️","Ofertas"],["🧷","Fraldas"],["🧻","Lenços"],["🛁","Higiene"],["🧴","Pomadas"],["🥣","Papinhas"],["🍼","Mamadeiras"],["👶","Roupinhas"],["🧸","Brinquedos"],["🛏️","Enxoval"],["🎁","Presentes"]];
+
+  const P=(e,n,p,o,off)=>({e,n,p,o,off});
+  const OFERTAS=[
+    P("🧷","Fralda Pampers Premium Care XG 68un","R$ 89,90","R$ 109,90",18),
+    P("🧻","Lenço Umedecido Huggies 3x96un","R$ 32,90","R$ 42,90",23),
+    P("🧷","Fralda Huggies Supreme M 80un","R$ 74,90","R$ 92,90",19),
+    P("🧴","Pomada Bepantol Baby 120g","R$ 39,90","R$ 49,90",20),
+    P("🥣","Papinha Nestlé Kit 6 sabores","R$ 27,90","R$ 34,90",20),
+    P("🍼","Mamadeira Avent Anti-cólica 260ml","R$ 44,90","R$ 59,90",25)
+  ];
+  const FRALDAS=[
+    P("🧷","Fralda MamyPoko Premium G 72un","R$ 69,90"),
+    P("🧷","Fralda Pampers Confort Sec M 74un","R$ 59,90"),
+    P("🧷","Fralda Huggies Tripla Proteção P 92un","R$ 64,90"),
+    P("🧷","Fralda Personal Baby GG 60un","R$ 54,90"),
+    P("🧷","Fralda Pom Pom Sensações XXG 56un","R$ 72,90"),
+    P("🧷","Fralda Turma da Mônica RN 36un","R$ 34,90")
+  ];
+  const HIGIENE=[
+    P("🛁","Sabonete Líquido Johnson's 400ml","R$ 24,90"),
+    P("🧴","Shampoo Baby Dove 200ml","R$ 18,90"),
+    P("🧴","Hidratante Mustela Bebê 300ml","R$ 79,90"),
+    P("🧻","Cotonete Baby Cremer 75un","R$ 9,90"),
+    P("🪥","Escova Dental Bebê MAM","R$ 21,90"),
+    P("🧴","Colônia Giovanna Baby 120ml","R$ 14,90")
+  ];
+
+  const card=(x)=>`<article class="prod">
+    ${x.off?`<span class="off">-${x.off}%</span>`:""}
+    <div class="pimg">${x.e}</div>
+    <div class="pname">${x.n}</div>
+    ${x.o?`<span class="old">${x.o}</span>`:""}
+    <div class="price">${x.p}</div>
+    <div class="pix">à vista no Pix</div>
+    <button class="buy" onclick="pedir('${x.n.replace(/'/g,"")}','${x.p}')">💬 Pedir no WhatsApp</button>
+  </article>`;
+
+  document.getElementById("chips").innerHTML=CHIPS.map(c=>`<div class="chip"><span class="e">${c[0]}</span>${c[1]}</div>`).join("");
+  document.getElementById("cats").innerHTML=CATS.map(c=>`<div class="cat"><span class="e">${c[0]}</span>${c[1]}<small>${c[2]||"&nbsp;"}</small></div>`).join("");
+  document.getElementById("ofertas-list").innerHTML=OFERTAS.map(card).join("");
+  document.getElementById("fraldas").innerHTML=FRALDAS.map(card).join("");
+  document.getElementById("higiene").innerHTML=HIGIENE.map(card).join("");
+</script>
