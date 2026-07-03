@@ -241,7 +241,7 @@
     </div>
     <div class="hside">
       <div class="mini b"><h3>🧷 Fraldas por tamanho</h3><p>Ache rápido do RN ao XXG.</p><span class="cta2" onclick="showDept('Fraldas')">Ver fraldas →</span></div>
-      <div class="mini"><h3>🎁 Monte seu enxoval</h3><p>A gente ajuda item por item.</p><span class="cta2" onclick="pedirGeral()">Falar no WhatsApp →</span></div>
+      <div class="mini"><h3>🍼 Chá de fralda</h3><p>Monte a lista com a gente e facilite pros convidados.</p><span class="cta2" onclick="pedirCha()">Organizar meu chá →</span></div>
     </div>
   </div>
 
@@ -321,6 +321,7 @@
   const WA="5585999587768"; // WhatsApp oficial da Lira Fraldas
   function pedir(nome,preco){window.open(`https://wa.me/${WA}?text=`+encodeURIComponent(`Olá, Lira Fraldas! 👋 Tenho interesse em: *${nome}* (${preco}). Pode me ajudar?`),"_blank");}
   function pedirGeral(){window.open(`https://wa.me/${WA}?text=`+encodeURIComponent("Olá, Lira Fraldas! Gostaria de tirar uma dúvida / fazer um pedido."),"_blank");}
+  function pedirCha(){window.open(`https://wa.me/${WA}?text=`+encodeURIComponent("Olá, Lira Fraldas! 🍼 Quero organizar um chá de fralda. Podem me ajudar com a lista e as fraldas?"),"_blank");}
 
   const {cats,prods}=window.LIRA;
   prods.forEach((p,i)=>{p.id=i;});
