@@ -21,6 +21,11 @@
     --pink:#F0919C; --pink-deep:#E06E7D;
     /* paleta multicolor pastel da logo (estilo "colorido e fofinho") */
     --c-mint:#CDEFE7; --c-pink:#FBDDE2; --c-peach:#FCE6D2; --c-yellow:#FBEFC9; --c-lilac:#E7DEF7; --c-sky:#D5EEF4;
+    /* arco-íris pastel do topo — faixas afinadas, ciclo duplo p/ aparecer mais cor (amarelo ocupa menos) */
+    --rainbow: linear-gradient(90deg,
+      var(--c-pink) 0%, var(--c-peach) 9%, var(--c-yellow) 17%, var(--c-mint) 26%,
+      var(--c-sky) 35%, var(--c-lilac) 44%, var(--c-pink) 53%, var(--c-peach) 61%,
+      var(--c-yellow) 69%, var(--c-mint) 78%, var(--c-sky) 87%, var(--c-lilac) 100%);
     --bg:#FFFFFF; --panel:#F5FBF9; --line:#E2EFEB; --wa:#25D366; --wa-deep:#1EA955;
     --r:20px; --shadow:0 8px 22px rgba(51,65,90,.10);
     --font:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
@@ -32,7 +37,7 @@
 
   .top{background:var(--navy);color:#fff;font-size:13px;font-weight:600;text-align:center;padding:8px}
   .top-short{display:none}
-  header{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,var(--mint),var(--mint-deep));color:var(--navy-deep)}
+  header{position:sticky;top:0;z-index:40;background:var(--rainbow);color:var(--navy-deep)}
   .hbar{display:flex;align-items:center;gap:18px;padding:13px 0}
   .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:20px;letter-spacing:-.3px;white-space:nowrap}
   .brand img{width:52px;height:52px;border-radius:50%;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.15)}
@@ -44,11 +49,11 @@
   .hlink{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;cursor:pointer}
   .hlink .ic{font-size:21px}
   .cartn{background:var(--pink);color:var(--navy-deep);font-size:11px;font-weight:800;border-radius:999px;padding:1px 7px;margin-left:2px}
-  nav.menu{background:#2D9478;border-top:1px solid rgba(255,255,255,.14)}
+  nav.menu{background:var(--rainbow);border-top:1px solid rgba(255,255,255,.45)}
   .menu ul{list-style:none;display:flex;gap:2px;margin:0;padding:0;overflow-x:auto;scrollbar-width:none}
   .menu ul::-webkit-scrollbar{display:none}
   .menu a{display:block;padding:12px 15px;font-weight:600;font-size:13.5px;color:var(--navy-deep);white-space:nowrap;cursor:pointer}
-  .menu a:hover,.menu a.on{background:rgba(255,255,255,.16)}
+  .menu a:hover,.menu a.on{background:rgba(255,255,255,.6)}
 
   .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;margin:24px 0;align-items:stretch}
   .hcard{border-radius:22px;padding:38px;color:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;min-height:250px;text-shadow:0 1px 8px rgba(20,28,45,.55);background:linear-gradient(100deg,rgba(38,50,74,.82) 0%,rgba(38,50,74,.5) 44%,rgba(38,50,74,.08) 74%),url('banner-hero.jpg') center/cover no-repeat}
