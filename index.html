@@ -111,6 +111,13 @@
   .pname{font-size:13.5px;font-weight:600;line-height:1.35;min-height:38px;margin-bottom:8px;color:var(--navy)}
   .price{font-size:20px;font-weight:800;color:var(--navy);letter-spacing:-.4px}
   .parc{font-size:12px;color:var(--muted);margin:2px 0 12px}
+  .price-tag{font-size:11px;font-weight:600;color:var(--muted)}
+  .avista{font-size:12.5px;color:var(--mint-deep);font-weight:600;margin:2px 0 12px;line-height:1.35}
+  .avista b{font-size:15px;font-weight:800}
+  .off{background:var(--mint-soft);color:var(--mint-deep);font-size:10px;font-weight:700;border-radius:6px;padding:1px 6px;white-space:nowrap}
+  .pv-avista{font-size:15px;color:var(--mint-deep);font-weight:700;margin-bottom:14px}
+  .pv-avista b{font-size:19px}
+  .cart-avista{display:flex;align-items:baseline;justify-content:space-between;font-size:13px;color:var(--mint-deep);font-weight:700;margin-top:3px}
   .buy{margin-top:auto;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--wa);color:#fff;font-weight:700;font-size:14px;border:0;border-radius:10px;padding:11px;cursor:pointer;transition:.15s}
   .buy:hover{background:var(--wa-deep)}
   .more{display:block;margin:22px auto 0;background:#fff;border:1.5px solid var(--navy);color:var(--navy);font-weight:800;font-size:14px;padding:12px 28px;border-radius:999px;cursor:pointer}
@@ -416,7 +423,8 @@
       <select id="cart-bairro" aria-label="Bairro de entrega" onchange="setBairro(this.value)"></select>
     </div>
     <div class="cart-frete" id="cart-frete"></div>
-    <div class="cart-sub cart-total-final"><span>Total</span><b id="cart-total-final">R$ 0,00</b></div>
+    <div class="cart-sub cart-total-final"><span>Total no cartão</span><b id="cart-total-final">R$ 0,00</b></div>
+    <div class="cart-avista"><span>💰 À vista (Pix/dinheiro) −6%</span><b id="cart-avista">R$ 0,00</b></div>
     <button class="cart-cta" id="cart-cta" onclick="finalizarPedido()">💬 Finalizar pedido no WhatsApp</button>
   </div>
 </aside>
@@ -444,6 +452,8 @@
   let cart={};
   try{cart=JSON.parse(localStorage.getItem("lira-cart")||"{}")||{};}catch(e){cart={};}
   const fmt=(v)=>"R$ "+v.toFixed(2).replace(".",",");
+  // Preço à vista (Pix/dinheiro) = preço de venda (cartão) com desconto automático.
+  const DESC_AVISTA=0.06; const avista=(v)=>v*(1-DESC_AVISTA);
   const cartCount=()=>Object.values(cart).reduce((s,i)=>s+i.q,0);
   const cartTotal=()=>Object.values(cart).reduce((s,i)=>s+i.v*i.q,0);
   const saveCart=()=>localStorage.setItem("lira-cart",JSON.stringify(cart));
@@ -502,8 +512,8 @@
         <div class="pv-info">
           <div class="pv-cat">${p.d}${p.t?' · '+p.t:''}</div>
           <div class="pv-name">${p.n}</div>
-          <div class="pv-price">${p.p}</div>
-          <div class="pv-parc">💳 Pix, dinheiro ou cartão</div>
+          <div class="pv-price">${p.p} <span class="price-tag">no cartão</span></div>
+          <div class="pv-avista">💰 <b>${fmt(avista(p.v))}</b> à vista <span class="off">−6% no Pix/dinheiro</span></div>
           <div class="pv-frete">🚚 Entrega em Fortaleza · frete pelo seu bairro · retirada grátis</div>
           <div class="pv-acts">
             <button class="pv-add" onclick="addCart(${p.id});closeProd()">＋ Adicionar ao carrinho</button>
@@ -577,6 +587,7 @@
     document.getElementById("cart-total").textContent=fmt(sub);
     const fr=document.getElementById("cart-frete"); fr.textContent=fi.txt; fr.className="cart-frete"+(fi.cls?" "+fi.cls:"");
     const tf=document.getElementById("cart-total-final"); if(tf)tf.textContent=fmt(sub+(fi.frete||0));
+    const av=document.getElementById("cart-avista"); if(av)av.textContent=fmt(avista(sub)+(fi.frete||0));
     document.getElementById("cart-cta").disabled=!items.length;
   }
 
@@ -604,16 +615,18 @@
     const pg=PAGAMENTOS.find(p=>p.v===getFormaPagamento());
     const bLabel=bairroEntrega&&window.LIRA_FRETE.bairros[bairroEntrega]?window.LIRA_FRETE.bairros[bairroEntrega].label:"";
     const temFrete=bLabel&&(fi.frete>0||fi.cls==="free");
+    const freteVal=temFrete?(fi.frete||0):0;
     let msg="Olá, Lira Fraldas! 👋 Quero fazer um pedido:\n\n";
     msg+=items.map(i=>`• ${i.q}x ${i.n} — ${i.p}`).join("\n");
-    msg+=`\n\n*Subtotal: ${fmt(sub)}*`;
+    msg+=`\n\n*Subtotal (cartão): ${fmt(sub)}*`;
     if(temFrete){
       msg+=bLabel?`\nBairro: ${bLabel}`:"";
       msg+=fi.frete===0?"\nFrete: grátis 🎉":`\nFrete: ${fmt(fi.frete)}`;
-      msg+=`\n*Total: ${fmt(sub+(fi.frete||0))}*`;
     }else{
       msg+="\nEntrega: combinar o frete pelo meu bairro"+(bLabel?` (${bLabel})`:"");
     }
+    msg+=`\n*Total no cartão: ${fmt(sub+freteVal)}*`;
+    msg+=`\n*Total à vista (Pix/dinheiro −6%): ${fmt(avista(sub)+freteVal)}*`;
     msg+="\nForma de pagamento: "+(pg?pg.t:"(a combinar)");
     window.open(`https://wa.me/${WA}?text=`+encodeURIComponent(msg),"_blank");
   };
@@ -626,8 +639,8 @@
     <div class="pbody">
       <div class="pcat">${p.d}${p.t?' · '+p.t:''}</div>
       <div class="pname">${p.n}</div>
-      <div class="price">${p.p}</div>
-      <div class="parc">💳 Pix, dinheiro ou cartão</div>
+      <div class="price">${p.p} <span class="price-tag">no cartão</span></div>
+      <div class="avista">💰 <b>${fmt(avista(p.v))}</b> à vista <span class="off">−6% Pix/dinheiro</span></div>
       <div class="frete-hint">🚚 Frete pelo seu bairro · retirada grátis na loja</div>
       <button class="add" onclick="event.stopPropagation();addCart(${p.id})">＋ Adicionar</button>
     </div>
