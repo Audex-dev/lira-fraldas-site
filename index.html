@@ -453,6 +453,10 @@
   try{cart=JSON.parse(localStorage.getItem("lira-cart")||"{}")||{};}catch(e){cart={};}
   const fmt=(v)=>"R$ "+v.toFixed(2).replace(".",",");
   // Preço à vista (Pix/dinheiro) = preço de venda (cartão) com desconto automático.
+  // AVISTA_ON: LIGAR (true) só depois que o Bosco subir os preços +6% no ERP.
+  // Enquanto false, o site mostra só o preço normal (sem à vista), pra não exibir
+  // preço 6% menor sobre os preços atuais. Ver [[PENDENCIAS]] P-340.
+  const AVISTA_ON=false;
   const DESC_AVISTA=0.06; const avista=(v)=>v*(1-DESC_AVISTA);
   const cartCount=()=>Object.values(cart).reduce((s,i)=>s+i.q,0);
   const cartTotal=()=>Object.values(cart).reduce((s,i)=>s+i.v*i.q,0);
@@ -512,8 +516,9 @@
         <div class="pv-info">
           <div class="pv-cat">${p.d}${p.t?' · '+p.t:''}</div>
           <div class="pv-name">${p.n}</div>
-          <div class="pv-price">${p.p} <span class="price-tag">no cartão</span></div>
-          <div class="pv-avista">💰 <b>${fmt(avista(p.v))}</b> à vista <span class="off">−6% no Pix/dinheiro</span></div>
+          ${AVISTA_ON?`<div class="pv-price">${p.p} <span class="price-tag">no cartão</span></div>
+          <div class="pv-avista">💰 <b>${fmt(avista(p.v))}</b> à vista <span class="off">−6% no Pix/dinheiro</span></div>`:`<div class="pv-price">${p.p}</div>
+          <div class="pv-parc">💳 Pix, dinheiro ou cartão</div>`}
           <div class="pv-frete">🚚 Entrega em Fortaleza · frete pelo seu bairro · retirada grátis</div>
           <div class="pv-acts">
             <button class="pv-add" onclick="addCart(${p.id});closeProd()">＋ Adicionar ao carrinho</button>
@@ -587,7 +592,9 @@
     document.getElementById("cart-total").textContent=fmt(sub);
     const fr=document.getElementById("cart-frete"); fr.textContent=fi.txt; fr.className="cart-frete"+(fi.cls?" "+fi.cls:"");
     const tf=document.getElementById("cart-total-final"); if(tf)tf.textContent=fmt(sub+(fi.frete||0));
-    const av=document.getElementById("cart-avista"); if(av)av.textContent=fmt(avista(sub)+(fi.frete||0));
+    const tfl=document.querySelector(".cart-total-final span"); if(tfl)tfl.textContent=AVISTA_ON?"Total no cartão":"Total";
+    const avRow=document.querySelector(".cart-avista"); if(avRow)avRow.style.display=AVISTA_ON?"":"none";
+    const av=document.getElementById("cart-avista"); if(av&&AVISTA_ON)av.textContent=fmt(avista(sub)+(fi.frete||0));
     document.getElementById("cart-cta").disabled=!items.length;
   }
 
@@ -618,15 +625,15 @@
     const freteVal=temFrete?(fi.frete||0):0;
     let msg="Olá, Lira Fraldas! 👋 Quero fazer um pedido:\n\n";
     msg+=items.map(i=>`• ${i.q}x ${i.n} — ${i.p}`).join("\n");
-    msg+=`\n\n*Subtotal (cartão): ${fmt(sub)}*`;
+    msg+=`\n\n*Subtotal${AVISTA_ON?" (cartão)":""}: ${fmt(sub)}*`;
     if(temFrete){
       msg+=bLabel?`\nBairro: ${bLabel}`:"";
       msg+=fi.frete===0?"\nFrete: grátis 🎉":`\nFrete: ${fmt(fi.frete)}`;
     }else{
       msg+="\nEntrega: combinar o frete pelo meu bairro"+(bLabel?` (${bLabel})`:"");
     }
-    msg+=`\n*Total no cartão: ${fmt(sub+freteVal)}*`;
-    msg+=`\n*Total à vista (Pix/dinheiro −6%): ${fmt(avista(sub)+freteVal)}*`;
+    msg+=`\n*Total${AVISTA_ON?" no cartão":""}: ${fmt(sub+freteVal)}*`;
+    if(AVISTA_ON)msg+=`\n*Total à vista (Pix/dinheiro −6%): ${fmt(avista(sub)+freteVal)}*`;
     msg+="\nForma de pagamento: "+(pg?pg.t:"(a combinar)");
     window.open(`https://wa.me/${WA}?text=`+encodeURIComponent(msg),"_blank");
   };
@@ -639,8 +646,9 @@
     <div class="pbody">
       <div class="pcat">${p.d}${p.t?' · '+p.t:''}</div>
       <div class="pname">${p.n}</div>
-      <div class="price">${p.p} <span class="price-tag">no cartão</span></div>
-      <div class="avista">💰 <b>${fmt(avista(p.v))}</b> à vista <span class="off">−6% Pix/dinheiro</span></div>
+      ${AVISTA_ON?`<div class="price">${p.p} <span class="price-tag">no cartão</span></div>
+      <div class="avista">💰 <b>${fmt(avista(p.v))}</b> à vista <span class="off">−6% Pix/dinheiro</span></div>`:`<div class="price">${p.p}</div>
+      <div class="parc">💳 Pix, dinheiro ou cartão</div>`}
       <div class="frete-hint">🚚 Frete pelo seu bairro · retirada grátis na loja</div>
       <button class="add" onclick="event.stopPropagation();addCart(${p.id})">＋ Adicionar</button>
     </div>
