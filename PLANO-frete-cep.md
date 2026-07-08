@@ -19,11 +19,16 @@ Na loja, adicionar **"Consulte frete por CEP"**: o cliente digita o CEP → reso
 - **R$10,00:** Bairro de Fátima, Edson Queiroz, Luciano Cavalcante, Salinas
 - **R$12,00:** Álvaro Weyne, Amadeu Furtado, Ancuri, Antônio Bezerra, Barroso, Barra do Ceará, Bela Vista, Benfica, Bom Jardim, Bom Sucesso, Cambeba, Cajazeiras, Canindezinho, Carlito Pamplona, Castelão, Cidade dos Funcionários, Conjunto Ceará, Conjunto Palmeiras, Cristo Redentor, Coaçu, Curió, Damas, Demócrito Rocha, Dias Macedo, Dom Lustosa, Ellery, Farias Brito, Floresta, Genibaú, Granja Portugal, Granja Lisboa, Guajiru, Henrique Jorge, Itaoca, Jacarecanga, Jardim América, Jardim Guanabara, Jangurussu, José Bonifácio, Jóquei Clube, João XXIII, José Walter, Lagoa Redonda, Messejana, Modubim, Monte Castelo, Montese, Passaré, Padre Andrade, Parquelândia, Parque Araxá, Parque Dois Irmãos, Parque Iracema, Parque São José, Parreão, Pirambu, Pici, Planalto Ayrton Senna, Presidente Kennedy, Quintino Cunha, Rodolfo Teófilo, Sapiranga, Serrinha, Siqueira, Vila Pery, Vila Velha, Vila União
 
-## 3. ⚠️ A CONFIRMAR com o Bosco ANTES de codar (perguntas)
-1. **Taxa dos bairros "grátis acima de 30/50" quando o pedido é ABAIXO do limite** — qual valor? (a barra atual do site diz "a partir de R$10 · grátis ≥ R$30"; confirmar o valor-base desses bairros.)
-2. **Bairro fora da lista** → é **retirada na loja**? "consultar no WhatsApp"? não entrega? (definir a mensagem/comportamento.)
-3. **"GENGIBRE"** (na faixa grátis≥50) — não é bairro conhecido de Fortaleza; confirmar grafia/real.
-4. **"Praia do Futuro 1/2"** e **"Cidade 2000"** — o ViaCEP costuma devolver "Praia do Futuro" (sem 1/2) e nomes variados; definir como mapear (pode exigir seleção manual do sub-bairro).
+## 3. Regras (RESOLVIDAS com John 2026-07-07) + o que ainda falta
+✅ **1. Faixas "grátis" — valor-base abaixo do limite = R$5,00** (confirmado John 2026-07-07):
+   - **Grátis ≥ R$30** (5 bairros: Mucuripe, Vicente Pinzon, Cais do Porto, Varjota, Serviluz): pedido ≥ R$30 → frete **R$0**; abaixo → **R$5**.
+   - **Grátis ≥ R$50** (Papicu, Gengibre): pedido ≥ R$50 → frete **R$0**; abaixo → **R$5**.
+   - ⇒ modelo: `{ taxa: 5, gratisAcima: 30|50 }`. Bairros de taxa fixa: `{ taxa: X, gratisAcima: null }`.
+✅ **1b. A regra grátis≥30 vale pros 5 bairros da tabela** (não só Vicente Pinzon) — confirmado John 2026-07-07.
+✅ **1c. CORRIGIR o site:** hoje o banner do topo + o carrinho anunciam "frete grátis a partir de R$30" **GLOBAL** → gera confusão (a regra é por-bairro). Trocar por consulta por bairro; msg neutra ("calcule o frete pelo seu bairro") até o cliente informar o bairro.
+⏳ **2. Bairro fora da lista** → PENDENTE (retirada na loja? "consultar no WhatsApp"? não entrega?). Default provisório sugerido: "não entregamos nesse bairro — retirada na loja ou fale no WhatsApp".
+⏳ **3. "GENGIBRE"** (faixa grátis≥50) — confirmar grafia/bairro real (mantido na tabela por ora).
+⏳ **4. "Praia do Futuro 1/2"** e **"Cidade 2000"** — o ViaCEP devolve nomes variados → mapear com dropdown/seleção manual do sub-bairro.
 
 ## 4. Fases
 

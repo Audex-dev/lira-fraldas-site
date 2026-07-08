@@ -226,6 +226,14 @@
   .cart-sub b{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
   .cart-frete{font-size:12.5px;color:var(--muted);margin-bottom:13px;line-height:1.4}
   .cart-frete.free{color:var(--mint-deep);font-weight:700}
+  .cart-frete.warn{color:#b45309;font-weight:600}
+  .cart-entrega{margin:10px 0 8px}
+  .cart-entrega > label{display:block;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:7px}
+  .cep-row{display:flex;gap:6px;margin-bottom:7px}
+  .cep-row input{flex:1;min-width:0;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:14px}
+  .cep-row button{background:var(--mint-deep,#1A7A66);color:#fff;border:0;border-radius:9px;padding:0 13px;font-size:13px;font-weight:700;cursor:pointer}
+  #cart-bairro{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:14px;background:#fff;color:var(--navy)}
+  .cart-total-final{margin-top:6px;padding-top:8px;border-top:1px dashed var(--line)}
   .cart-cta{width:100%;background:var(--wa);color:#fff;border:0;border-radius:12px;padding:15px;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s}
   .cart-cta:hover{background:var(--wa-deep)}
   .cart-cta:disabled{opacity:.45;cursor:not-allowed}
@@ -293,7 +301,7 @@
   }
 </style>
 
-<div class="top"><span class="top-full">🚚 Entrega em Fortaleza a partir de R$ 10 · frete grátis a partir de R$ 30 · retirada grátis na loja · 💬 pedido no WhatsApp</span><span class="top-short">🚚 Frete grátis a partir de R$ 30 · pedido no WhatsApp</span></div>
+<div class="top"><span class="top-full">🚚 Entregamos em Fortaleza · calcule o frete pelo seu bairro no carrinho · retirada grátis na loja · 💬 pedido no WhatsApp</span><span class="top-short">🚚 Frete pelo seu bairro · retirada grátis · WhatsApp</span></div>
 
 <header>
   <div class="wrap hbar">
@@ -394,7 +402,16 @@
       <div class="pays" id="pays" role="radiogroup" aria-label="Forma de pagamento"></div>
     </div>
     <div class="cart-sub"><span>Subtotal</span><b id="cart-total">R$ 0,00</b></div>
+    <div class="cart-entrega">
+      <label for="cart-cep">Entrega — qual seu bairro?</label>
+      <div class="cep-row">
+        <input id="cart-cep" inputmode="numeric" maxlength="9" placeholder="CEP (opcional)" oninput="maskCep(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();consultarCep()}">
+        <button type="button" onclick="consultarCep()">Buscar</button>
+      </div>
+      <select id="cart-bairro" aria-label="Bairro de entrega" onchange="setBairro(this.value)"></select>
+    </div>
     <div class="cart-frete" id="cart-frete"></div>
+    <div class="cart-sub cart-total-final"><span>Total</span><b id="cart-total-final">R$ 0,00</b></div>
     <button class="cart-cta" id="cart-cta" onclick="finalizarPedido()">💬 Finalizar pedido no WhatsApp</button>
   </div>
 </aside>
@@ -407,6 +424,7 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="produtos.js"></script>
+<script src="fretes.js?v=20260707"></script>
 <script>
   const WA="5585999587768"; // WhatsApp oficial da Lira Fraldas
   function pedir(nome,preco){window.open(`https://wa.me/${WA}?text=`+encodeURIComponent(`Olá, Lira Fraldas! 👋 Quero comprar: *${nome}* — ${preco}. Qual a disponibilidade e como pagar?`),"_blank");}
@@ -418,7 +436,6 @@
   const EMO=Object.fromEntries(cats.map(c=>[c.nome,c.emoji]));
 
   // ===== Carrinho (multi-item -> 1 pedido no WhatsApp) =====
-  const FRETE_GRATIS=30; // pedido >= R$30 = frete grátis (promo atual da Lira)
   let cart={};
   try{cart=JSON.parse(localStorage.getItem("lira-cart")||"{}")||{};}catch(e){cart={};}
   const fmt=(v)=>"R$ "+v.toFixed(2).replace(".",",");
@@ -482,7 +499,7 @@
           <div class="pv-name">${p.n}</div>
           <div class="pv-price">${p.p}</div>
           <div class="pv-parc">💳 Pix, dinheiro ou cartão</div>
-          <div class="pv-frete">🚚 Frete grátis a partir de R$ 30</div>
+          <div class="pv-frete">🚚 Entrega em Fortaleza · frete pelo seu bairro · retirada grátis</div>
           <div class="pv-acts">
             <button class="pv-add" onclick="addCart(${p.id});closeProd()">＋ Adicionar ao carrinho</button>
             <button class="pv-wa" onclick="pedir(${JSON.stringify(p.n)},${JSON.stringify(p.p)})">💬 Pedir no WhatsApp</button>
@@ -500,11 +517,37 @@
     if(_pvTrigger&&_pvTrigger.focus){try{_pvTrigger.focus();}catch(e){}_pvTrigger=null;}
   };
 
+  // ===== Frete por bairro (fonte: fretes.js gerado do ERP) =====
+  let bairroEntrega=localStorage.getItem("lira-bairro")||"";
+  function renderBairros(){
+    const sel=document.getElementById("cart-bairro"); if(!sel||!window.LIRA_FRETE)return;
+    const opts=Object.entries(window.LIRA_FRETE.bairros).map(([k,v])=>({k,label:v.label})).sort((a,b)=>a.label.localeCompare(b.label,"pt"));
+    sel.innerHTML='<option value="">Selecione seu bairro…</option>'+opts.map(o=>`<option value="${o.k}"${o.k===bairroEntrega?' selected':''}>${o.label}</option>`).join("");
+  }
+  window.setBairro=(k)=>{bairroEntrega=k||"";localStorage.setItem("lira-bairro",bairroEntrega);updateCart();};
+  window.maskCep=(el)=>{let v=el.value.replace(/\D/g,"").slice(0,8);if(v.length>5)v=v.slice(0,5)+"-"+v.slice(5);el.value=v;};
+  window.consultarCep=async()=>{
+    const el=document.getElementById("cart-cep"); const cep=(el.value||"").replace(/\D/g,"");
+    const fr=document.getElementById("cart-frete");
+    if(cep.length!==8){fr.textContent="Digite um CEP válido (8 dígitos) ou escolha o bairro na lista.";fr.className="cart-frete warn";return;}
+    fr.textContent="Buscando seu bairro…";fr.className="cart-frete";
+    try{
+      const r=await fetch(`https://viacep.com.br/ws/${cep}/json/`); const j=await r.json();
+      if(j.erro||(j.localidade||"").toUpperCase()!=="FORTALEZA"){fr.textContent="Não entregamos nesse endereço — retirada na loja ou combine pelo WhatsApp.";fr.className="cart-frete warn";return;}
+      const k=window.LIRA_FRETE_norm(j.bairro);
+      if(window.LIRA_FRETE.bairros[k]){bairroEntrega=k;localStorage.setItem("lira-bairro",k);renderBairros();updateCart();}
+      else{fr.textContent=`Bairro "${j.bairro}" fora da lista — escolha o mais próximo na lista ou combine pelo WhatsApp.`;fr.className="cart-frete warn";}
+    }catch(e){fr.textContent="Não consegui consultar o CEP agora — escolha o bairro na lista.";fr.className="cart-frete warn";}
+  };
+  // Retorna {frete, txt, cls} conforme bairro escolhido + subtotal
   function freteInfo(sub){
-    if(sub>=FRETE_GRATIS)return{txt:"🎉 Você ganhou frete grátis! (pedido a partir de R$ 30)",free:true};
-    return{txt:`Faltam ${fmt(FRETE_GRATIS-sub)} para o frete grátis · taxa de entrega combinada no WhatsApp pelo seu bairro.`,free:false};
-    // TODO frete por bairro (P-235): quando o Bosco enviar a tabela bairro->taxa,
-    // trocar por cálculo por endereço aqui e no checkout.
+    if(!bairroEntrega)return{frete:0,txt:"Informe seu bairro (CEP ou lista) para ver o frete.",cls:""};
+    const c=window.LIRA_FRETE_calc(bairroEntrega,sub);
+    if(!c.encontrado)return{frete:0,txt:window.LIRA_FRETE.foraDaLista.msg,cls:"warn"};
+    if(c.frete===0&&c.gratisAcima!=null)return{frete:0,txt:`🎉 Frete grátis para ${c.label} (pedido a partir de ${fmt(c.gratisAcima)})`,cls:"free"};
+    let t=`Frete para ${c.label}: ${fmt(c.frete)}`;
+    if(c.gratisAcima!=null)t+=` · grátis a partir de ${fmt(c.gratisAcima)} (faltam ${fmt(c.gratisAcima-sub)})`;
+    return{frete:c.frete,txt:t,cls:""};
   }
 
   function updateCart(){
@@ -527,7 +570,8 @@
     }
     const sub=cartTotal(), fi=freteInfo(sub);
     document.getElementById("cart-total").textContent=fmt(sub);
-    const fr=document.getElementById("cart-frete"); fr.textContent=fi.txt; fr.className="cart-frete"+(fi.free?" free":"");
+    const fr=document.getElementById("cart-frete"); fr.textContent=fi.txt; fr.className="cart-frete"+(fi.cls?" "+fi.cls:"");
+    const tf=document.getElementById("cart-total-final"); if(tf)tf.textContent=fmt(sub+(fi.frete||0));
     document.getElementById("cart-cta").disabled=!items.length;
   }
 
@@ -553,12 +597,19 @@
     const items=Object.values(cart); if(!items.length)return;
     const sub=cartTotal(), fi=freteInfo(sub);
     const pg=PAGAMENTOS.find(p=>p.v===getFormaPagamento());
+    const bLabel=bairroEntrega&&window.LIRA_FRETE.bairros[bairroEntrega]?window.LIRA_FRETE.bairros[bairroEntrega].label:"";
+    const temFrete=bLabel&&(fi.frete>0||fi.cls==="free");
     let msg="Olá, Lira Fraldas! 👋 Quero fazer um pedido:\n\n";
     msg+=items.map(i=>`• ${i.q}x ${i.n} — ${i.p}`).join("\n");
     msg+=`\n\n*Subtotal: ${fmt(sub)}*`;
-    msg+=fi.free?"\nFrete: grátis 🎉":"\nFrete: a combinar pelo bairro";
+    if(temFrete){
+      msg+=bLabel?`\nBairro: ${bLabel}`:"";
+      msg+=fi.frete===0?"\nFrete: grátis 🎉":`\nFrete: ${fmt(fi.frete)}`;
+      msg+=`\n*Total: ${fmt(sub+(fi.frete||0))}*`;
+    }else{
+      msg+="\nEntrega: combinar o frete pelo meu bairro"+(bLabel?` (${bLabel})`:"");
+    }
     msg+="\nForma de pagamento: "+(pg?pg.t:"(a combinar)");
-    msg+="\n\nMeu bairro para entrega: ";
     window.open(`https://wa.me/${WA}?text=`+encodeURIComponent(msg),"_blank");
   };
   const PER=24; let base=[], view=[], shown=0, curDept=cats[0].nome, sz="", pmin=0, pmax=1e9;
@@ -572,7 +623,7 @@
       <div class="pname">${p.n}</div>
       <div class="price">${p.p}</div>
       <div class="parc">💳 Pix, dinheiro ou cartão</div>
-      <div class="frete-hint">🚚 Frete grátis a partir de R$ 30</div>
+      <div class="frete-hint">🚚 Frete pelo seu bairro · retirada grátis na loja</div>
       <button class="add" onclick="event.stopPropagation();addCart(${p.id})">＋ Adicionar</button>
     </div>
   </article>`;
@@ -625,6 +676,7 @@
   let toastT; window.toast=(m)=>{const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),1600);};
   document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeProd();closeCart();}});
   renderPagamentos();
+  renderBairros();
   updateCart(); // restaura badge/itens do localStorage
 
   // PWA: registra o service worker (só https/produção; falha silenciosa em file://)
