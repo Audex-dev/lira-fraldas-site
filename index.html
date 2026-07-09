@@ -103,6 +103,11 @@
   .prod:hover{box-shadow:var(--shadow);transform:translateY(-3px)}
   .prod:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
   .tag{position:absolute;top:12px;left:12px;background:var(--pink);color:var(--navy-deep);font-size:11px;font-weight:800;border-radius:7px;padding:3px 9px}
+  .fav-btn{position:absolute;top:8px;right:8px;z-index:2;width:34px;height:34px;border:none;border-radius:999px;background:rgba(255,255,255,.9);box-shadow:0 1px 5px rgba(38,50,74,.18);font-size:16px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:.15s;padding:0}
+  .fav-btn:hover{background:#fff;transform:scale(1.08)}
+  .fav-btn.on{background:var(--pink)}
+  .pv-fav{border:1.5px solid var(--line);background:#fff;border-radius:11px;padding:0 15px;font-size:13px;font-weight:700;color:var(--navy);cursor:pointer;transition:.15s;white-space:nowrap}
+  .pv-fav.on{border-color:var(--pink);background:#FFEEF0}
   .pimg{aspect-ratio:1;display:grid;place-items:center;font-size:60px;background:linear-gradient(135deg,var(--mint-soft),#FFEEF0);overflow:hidden}
   .pimg.has-photo{background:#fff}
   .pimg img{width:100%;height:100%;object-fit:contain;padding:10px}
@@ -330,6 +335,7 @@
     </form>
     <div class="hact">
       <div class="hlink" role="button" tabindex="0" aria-label="Entrar na conta"><span class="ic">👤</span><span class="txt">Entrar</span></div>
+      <div class="hlink" role="button" tabindex="0" aria-label="Ver favoritos" onclick="showFavs()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showFavs()}"><span class="ic">❤️</span><span class="txt">Favoritos</span><span class="cartn" id="favn">0</span></div>
       <div class="hlink" role="button" tabindex="0" aria-label="Ver carrinho" onclick="openCart()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCart()}"><span class="ic">🛒</span><span class="txt">Carrinho</span><span class="cartn" id="cartn">0</span></div>
     </div>
   </div>
@@ -459,6 +465,36 @@
   prods.forEach((p,i)=>{p.id=i;});
   const EMO=Object.fromEntries(cats.map(c=>[c.nome,c.emoji]));
 
+  // ===== Favoritos (localStorage) =====
+  let favs=new Set((JSON.parse(localStorage.getItem("lira-favs")||"[]")||[]).map(Number));
+  let favView=false;
+  function renderFavBadge(){const b=document.getElementById("favn");if(b)b.textContent=favs.size;}
+  window.toggleFav=(id,cardBtn,pvBtn)=>{
+    id=+id;
+    const on=!favs.has(id);
+    if(on)favs.add(id);else favs.delete(id);
+    localStorage.setItem("lira-favs",JSON.stringify([...favs]));
+    if(cardBtn){cardBtn.classList.toggle("on",on);cardBtn.textContent=on?"❤️":"🤍";cardBtn.setAttribute("aria-pressed",on);}
+    if(pvBtn){pvBtn.classList.toggle("on",on);pvBtn.textContent=on?"❤️ Favorito":"🤍 Favoritar";pvBtn.setAttribute("aria-pressed",on);}
+    // mantém o coração do card em sincronia quando a ação veio do quick-view
+    document.querySelectorAll(`.prod .fav-btn[onclick*="toggleFav(${id},"]`).forEach(b=>{if(b!==cardBtn){b.classList.toggle("on",on);b.textContent=on?"❤️":"🤍";b.setAttribute("aria-pressed",on);}});
+    renderFavBadge();
+    toast(on?"Adicionado aos favoritos ❤️":"Removido dos favoritos");
+    if(favView&&!on)showFavs(); // some da lista se removido enquanto estou na visão de favoritos
+  };
+  window.showFavs=()=>{
+    favView=true;curDept="";sz="";
+    const q=document.getElementById("q");if(q)q.value="";
+    base=prods.filter(p=>favs.has(p.id));
+    document.getElementById("lt").textContent="❤️ Meus favoritos";
+    document.getElementById("sizebox").style.display="none";
+    document.querySelectorAll(".cat").forEach(c=>c.classList.remove("on"));
+    document.querySelectorAll(".menu a").forEach(a=>a.classList.remove("on"));
+    const cs=document.getElementById("catsel");if(cs)cs.value="";
+    apply();
+    document.getElementById("produtos").scrollIntoView({behavior:"smooth"});
+  };
+
   // ===== Carrinho (multi-item -> 1 pedido no WhatsApp) =====
   let cart={};
   try{cart=JSON.parse(localStorage.getItem("lira-cart")||"{}")||{};}catch(e){cart={};}
@@ -533,6 +569,7 @@
           <div class="pv-frete">🚚 Entrega em Fortaleza · frete pelo seu bairro · retirada grátis</div>
           <div class="pv-acts">
             <button class="pv-add" onclick="addCart(${p.id});closeProd()">＋ Adicionar ao carrinho</button>
+            <button class="pv-fav${favs.has(p.id)?' on':''}" aria-pressed="${favs.has(p.id)}" onclick="toggleFav(${p.id},null,this)">${favs.has(p.id)?'❤️ Favorito':'🤍 Favoritar'}</button>
             <button class="pv-wa" onclick="pedir(${JSON.stringify(p.n)},${JSON.stringify(p.p)})">💬 Pedir no WhatsApp</button>
           </div>
         </div>
@@ -671,6 +708,7 @@
 
   const card=(p)=>`<article class="prod" role="button" tabindex="0" aria-label="Ver detalhes: ${p.n}" onclick="openProd(${p.id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openProd(${p.id})}">
     ${p.e>0&&p.e<=5?'<span class="tag">Últimas</span>':''}
+    <button class="fav-btn${favs.has(p.id)?' on':''}" aria-label="Favoritar ${p.n}" aria-pressed="${favs.has(p.id)}" onclick="event.stopPropagation();toggleFav(${p.id},this)">${favs.has(p.id)?'❤️':'🤍'}</button>
     <div class="pimg${p.f?' has-photo':''}">${p.f?`<img src="fotos/${p.f}" alt="${p.n}" loading="lazy" onerror="this.parentNode.classList.remove('has-photo');this.replaceWith(document.createTextNode(EMO['${p.d.replace(/'/g,"\\'")}']||'🛒'))">`:(EMO[p.d]||'🛒')}</div>
     <div class="pbody">
       <div class="pcat">${p.d}${p.t?' · '+p.t:''}</div>
@@ -695,10 +733,13 @@
     shown+=slice.length;
     document.getElementById("more").style.display=shown<view.length?"block":"none";
     document.getElementById("lc").textContent=view.length+" produtos";
-    if(!view.length)g.innerHTML='<p class="empty">Nada com esse filtro — fale no WhatsApp que a gente acha pra você. 💬</p>';
+    if(!view.length)g.innerHTML=favView
+      ?'<p class="empty">Você ainda não favoritou nada. Toque no 🤍 dos produtos pra guardar seus preferidos aqui. ❤️</p>'
+      :'<p class="empty">Nada com esse filtro — fale no WhatsApp que a gente acha pra você. 💬</p>';
   }
   window.setPreco=(a,b)=>{pmin=a;pmax=b;apply();};
   window.showDept=(d)=>{
+    favView=false;
     curDept=d;sz="";document.getElementById("q").value="";
     base=prods.filter(p=>p.d===d);
     document.getElementById("lt").textContent=d;
@@ -711,6 +752,7 @@
     document.getElementById("produtos").scrollIntoView({behavior:"smooth"});
   };
   function search(q){
+    favView=false;
     q=q.trim().toLowerCase();
     if(!q){showDept(curDept);return;}
     base=prods.filter(p=>p.n.toLowerCase().includes(q)||p.d.toLowerCase().includes(q));
@@ -733,6 +775,7 @@
   renderPagamentos();
   renderBairros();
   renderModo();
+  renderFavBadge();
   updateCart(); // restaura badge/itens do localStorage
 
   // PWA: registra o service worker (só https/produção; falha silenciosa em file://)
