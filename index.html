@@ -240,6 +240,11 @@
   .cart-frete{font-size:12.5px;color:var(--muted);margin-bottom:13px;line-height:1.4}
   .cart-frete.free{color:var(--mint-deep);font-weight:700}
   .cart-frete.warn{color:#b45309;font-weight:600}
+  .cart-modo{display:flex;gap:7px;margin:2px 0 12px}
+  .modo{flex:1;border:1.5px solid var(--line);background:#fff;color:var(--navy);border-radius:9px;padding:9px 8px;font-size:12.5px;font-weight:700;cursor:pointer;transition:.15s}
+  .modo.on{border-color:var(--mint-deep);background:var(--mint-soft);color:#1A7A66}
+  .cart-retirada{font-size:12.5px;color:var(--muted);line-height:1.5;margin:2px 0 13px;padding:10px 12px;background:var(--mint-soft);border-radius:9px}
+  .cart-retirada b{color:var(--navy)}
   .cart-entrega{margin:10px 0 8px}
   .cart-entrega > label{display:block;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:7px}
   .cep-row{display:flex;gap:6px;margin-bottom:7px}
@@ -415,7 +420,12 @@
       <div class="pays" id="pays" role="radiogroup" aria-label="Forma de pagamento"></div>
     </div>
     <div class="cart-sub"><span>Subtotal</span><b id="cart-total">R$ 0,00</b></div>
-    <div class="cart-entrega">
+    <div class="cart-modo" role="radiogroup" aria-label="Como você quer receber">
+      <button type="button" class="modo on" id="modo-entrega" role="radio" aria-checked="true" onclick="setModo('entrega')">🛵 Entrega</button>
+      <button type="button" class="modo" id="modo-retirada" role="radio" aria-checked="false" onclick="setModo('retirada')">🏪 Retirar na loja</button>
+    </div>
+    <div class="cart-retirada" id="cart-retirada" hidden>🏪 <b>Retirada grátis na loja</b><br>Rua Juvêncio Vasconcelos, 385 A — Fortaleza/CE<br>🕐 Seg–Sex 8h–18h · Sáb 8h–12h</div>
+    <div class="cart-entrega" id="cart-entrega-box">
       <label for="cart-cep">Entrega — qual seu bairro?</label>
       <div class="cep-row">
         <input id="cart-cep" inputmode="numeric" maxlength="9" placeholder="CEP (opcional)" oninput="maskCep(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();consultarCep()}">
@@ -546,6 +556,18 @@
     sel.innerHTML='<option value="">Selecione seu bairro…</option>'+opts.map(o=>`<option value="${o.k}"${o.k===bairroEntrega?' selected':''}>${o.label}</option>`).join("");
   }
   window.setBairro=(k)=>{bairroEntrega=k||"";localStorage.setItem("lira-bairro",bairroEntrega);updateCart();};
+  // ===== Entrega x Retirada na loja =====
+  let modoEntrega=localStorage.getItem("lira-modo")||"entrega";
+  function renderModo(){
+    const e=document.getElementById("modo-entrega"),r=document.getElementById("modo-retirada");
+    if(!e||!r)return;
+    const isE=modoEntrega!=="retirada";
+    e.classList.toggle("on",isE);e.setAttribute("aria-checked",isE);
+    r.classList.toggle("on",!isE);r.setAttribute("aria-checked",!isE);
+    const box=document.getElementById("cart-entrega-box");if(box)box.hidden=!isE;
+    const ret=document.getElementById("cart-retirada");if(ret)ret.hidden=isE;
+  }
+  window.setModo=(m)=>{modoEntrega=(m==="retirada"?"retirada":"entrega");localStorage.setItem("lira-modo",modoEntrega);renderModo();updateCart();};
   window.maskCep=(el)=>{let v=el.value.replace(/\D/g,"").slice(0,8);if(v.length>5)v=v.slice(0,5)+"-"+v.slice(5);el.value=v;};
   window.consultarCep=async()=>{
     const el=document.getElementById("cart-cep"); const cep=(el.value||"").replace(/\D/g,"");
@@ -589,9 +611,11 @@
         <button class="ci-rm" aria-label="Remover" onclick="rmItem(${id})">🗑</button>
       </div>`).join("");
     }
-    const sub=cartTotal(), fi=freteInfo(sub);
+    const sub=cartTotal();
+    const retirada=modoEntrega==="retirada";
+    const fi=retirada?{frete:0,txt:"",cls:""}:freteInfo(sub);
     document.getElementById("cart-total").textContent=fmt(sub);
-    const fr=document.getElementById("cart-frete"); fr.textContent=fi.txt; fr.className="cart-frete"+(fi.cls?" "+fi.cls:"");
+    const fr=document.getElementById("cart-frete"); fr.textContent=fi.txt; fr.className="cart-frete"+(fi.cls?" "+fi.cls:""); fr.style.display=retirada?"none":"";
     const tf=document.getElementById("cart-total-final"); if(tf)tf.textContent=fmt(sub+(fi.frete||0));
     const tfl=document.querySelector(".cart-total-final span"); if(tfl)tfl.textContent=AVISTA_ON?"Total no cartão":"Total";
     const avRow=document.querySelector(".cart-avista"); if(avRow)avRow.style.display=AVISTA_ON?"":"none";
@@ -619,15 +643,19 @@
 
   window.finalizarPedido=()=>{
     const items=Object.values(cart); if(!items.length)return;
-    const sub=cartTotal(), fi=freteInfo(sub);
+    const sub=cartTotal();
+    const retirada=modoEntrega==="retirada";
+    const fi=retirada?{frete:0,txt:"",cls:""}:freteInfo(sub);
     const pg=PAGAMENTOS.find(p=>p.v===getFormaPagamento());
     const bLabel=bairroEntrega&&window.LIRA_FRETE.bairros[bairroEntrega]?window.LIRA_FRETE.bairros[bairroEntrega].label:"";
-    const temFrete=bLabel&&(fi.frete>0||fi.cls==="free");
+    const temFrete=!retirada&&bLabel&&(fi.frete>0||fi.cls==="free");
     const freteVal=temFrete?(fi.frete||0):0;
     let msg="Olá, Lira Fraldas! 👋 Quero fazer um pedido:\n\n";
     msg+=items.map(i=>`• ${i.q}x ${i.n} — ${i.p}`).join("\n");
     msg+=`\n\n*Subtotal${AVISTA_ON?" (cartão)":""}: ${fmt(sub)}*`;
-    if(temFrete){
+    if(retirada){
+      msg+="\n🏪 *Retirada na loja* — Rua Juvêncio Vasconcelos, 385 A, Fortaleza/CE";
+    }else if(temFrete){
       msg+=bLabel?`\nBairro: ${bLabel}`:"";
       msg+=fi.frete===0?"\nFrete: grátis 🎉":`\nFrete: ${fmt(fi.frete)}`;
     }else{
@@ -704,6 +732,7 @@
   document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeProd();closeCart();}});
   renderPagamentos();
   renderBairros();
+  renderModo();
   updateCart(); // restaura badge/itens do localStorage
 
   // PWA: registra o service worker (só https/produção; falha silenciosa em file://)
