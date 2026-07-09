@@ -371,6 +371,11 @@
     <div class="cats" id="cats"></div>
   </section>
 
+  <section class="shelf" id="shelf-top" style="display:none">
+    <div class="shelf-h"><h2>🔥 Mais vendidos</h2></div>
+    <div class="shelf-row" id="top-row"></div>
+  </section>
+
   <section class="shelf" id="shelf-kits" style="display:none">
     <div class="shelf-h"><h2>🎁 Kits &amp; Presentes</h2><button class="shelf-all" onclick="showDept('Kits &amp; Presentes')">Ver todos →</button></div>
     <div class="shelf-row" id="kits-row"></div>
@@ -789,6 +794,14 @@
   renderBairros();
   renderModo();
   renderFavBadge();
+  (function renderMais(){
+    const sec=document.getElementById("shelf-top"), row=document.getElementById("top-row");
+    if(!sec||!row)return;
+    const top=prods.filter(p=>p.vd>0).sort((a,b)=>b.vd-a.vd).slice(0,12);
+    if(top.length<4)return; // precisa de um mínimo pra prateleira valer (fica oculta até o rebuild trazer 'vd')
+    row.innerHTML=top.map(card).join("");
+    sec.style.display="";
+  })();
   (function renderKits(){
     const sec=document.getElementById("shelf-kits"), row=document.getElementById("kits-row");
     if(!sec||!row)return;
