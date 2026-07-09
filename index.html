@@ -264,6 +264,13 @@
   .cep-row input{flex:1;min-width:0;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:14px}
   .cep-row button{background:var(--mint-deep,#1A7A66);color:#fff;border:0;border-radius:9px;padding:0 13px;font-size:13px;font-weight:700;cursor:pointer}
   #cart-bairro{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:14px;background:#fff;color:var(--navy)}
+  .cart-dados{margin:2px 0 11px}
+  .cart-dados > label{display:block;font-size:12px;font-weight:700;color:var(--navy);margin-bottom:7px}
+  .cart-dados input,.end-row input{padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:14px;background:#fff;color:var(--navy)}
+  .cart-dados > input{width:100%}
+  .end-row{display:flex;gap:6px;margin-top:7px}
+  .end-row input.rua{flex:1;min-width:0}
+  .end-row input.num{width:82px}
   .cart-total-final{margin-top:6px;padding-top:8px;border-top:1px dashed var(--line)}
   .cart-cta{width:100%;background:var(--wa);color:#fff;border:0;border-radius:12px;padding:15px;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s}
   .cart-cta:hover{background:var(--wa-deep)}
@@ -359,7 +366,7 @@
       <span class="cta" onclick="document.getElementById('produtos').scrollIntoView({behavior:'smooth'})">Comprar agora →</span>
     </div>
     <div class="hside">
-      <div class="mini b"><h3>🧷 Fraldas por tamanho</h3><p>Ache rápido do RN ao XXG.</p><span class="cta2" role="button" tabindex="0" onclick="showDept('Fraldas')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Ver fraldas →</span></div>
+      <div class="mini b"><h3>🧷 Fraldas por tamanho</h3><p>Ache rápido do RN ao XXXG.</p><span class="cta2" role="button" tabindex="0" onclick="showDept('Fraldas')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Ver fraldas →</span></div>
       <div class="mini"><h3>🍼 Chá de fralda</h3><p>Monte a lista com a gente e facilite pros convidados.</p><span class="cta2" role="button" tabindex="0" onclick="pedirCha()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">Organizar meu chá →</span></div>
     </div>
   </div>
@@ -444,6 +451,10 @@
       <div class="pays" id="pays" role="radiogroup" aria-label="Forma de pagamento"></div>
     </div>
     <div class="cart-sub"><span>Subtotal</span><b id="cart-total">R$ 0,00</b></div>
+    <div class="cart-dados">
+      <label for="cart-nome">Seus dados</label>
+      <input id="cart-nome" type="text" placeholder="Seu nome" autocomplete="name" oninput="setDado('nome',this.value)">
+    </div>
     <div class="cart-modo" role="radiogroup" aria-label="Como você quer receber">
       <button type="button" class="modo on" id="modo-entrega" role="radio" aria-checked="true" onclick="setModo('entrega')">🛵 Entrega</button>
       <button type="button" class="modo" id="modo-retirada" role="radio" aria-checked="false" onclick="setModo('retirada')">🏪 Retirar na loja</button>
@@ -456,6 +467,10 @@
         <button type="button" onclick="consultarCep()">Buscar</button>
       </div>
       <select id="cart-bairro" aria-label="Bairro de entrega" onchange="setBairro(this.value)"></select>
+      <div class="end-row">
+        <input id="cart-rua" class="rua" type="text" placeholder="Rua / Av." autocomplete="address-line1" oninput="setDado('rua',this.value)">
+        <input id="cart-num" class="num" type="text" placeholder="Nº" inputmode="numeric" autocomplete="address-line2" oninput="setDado('num',this.value)">
+      </div>
     </div>
     <div class="cart-frete" id="cart-frete"></div>
     <div class="cart-sub cart-total-final"><span>Total no cartão</span><b id="cart-total-final">R$ 0,00</b></div>
@@ -579,7 +594,7 @@
       <div class="pv-body">
         <div class="pv-img${p.f?' has-photo':''}">${inner}</div>
         <div class="pv-info">
-          <div class="pv-cat">${p.d}${p.t?' · '+p.t:''}</div>
+          <div class="pv-cat">${p.d}${sizeTag(p)?' · '+sizeTag(p):''}</div>
           <div class="pv-name">${p.n}</div>
           ${AVISTA_ON?`<div class="pv-price">${p.p} <span class="price-tag">no cartão</span></div>
           <div class="pv-avista">💰 <b>${fmt(avista(p.v))}</b> à vista <span class="off">−6% no Pix/dinheiro</span></div>`:`<div class="pv-price">${p.p}</div>
@@ -611,6 +626,10 @@
     sel.innerHTML='<option value="">Selecione seu bairro…</option>'+opts.map(o=>`<option value="${o.k}"${o.k===bairroEntrega?' selected':''}>${o.label}</option>`).join("");
   }
   window.setBairro=(k)=>{bairroEntrega=k||"";localStorage.setItem("lira-bairro",bairroEntrega);updateCart();};
+  // ===== Dados do cliente (nome + endereço) — persistidos e enviados no pedido =====
+  const dados={nome:localStorage.getItem("lira-nome")||"",rua:localStorage.getItem("lira-rua")||"",num:localStorage.getItem("lira-num")||""};
+  window.setDado=(k,v)=>{dados[k]=(v||"").trim();localStorage.setItem("lira-"+k,dados[k]);};
+  function prefillDados(){const map={nome:"cart-nome",rua:"cart-rua",num:"cart-num"};for(const k in map){const el=document.getElementById(map[k]);if(el&&dados[k])el.value=dados[k];}}
   // ===== Entrega x Retirada na loja =====
   let modoEntrega=localStorage.getItem("lira-modo")||"entrega";
   function renderModo(){
@@ -705,16 +724,17 @@
     const bLabel=bairroEntrega&&window.LIRA_FRETE.bairros[bairroEntrega]?window.LIRA_FRETE.bairros[bairroEntrega].label:"";
     const temFrete=!retirada&&bLabel&&(fi.frete>0||fi.cls==="free");
     const freteVal=temFrete?(fi.frete||0):0;
-    let msg="Olá, Lira Fraldas! 👋 Quero fazer um pedido:\n\n";
+    let msg="Olá, Lira Fraldas! 👋 Quero fazer um pedido:\n";
+    if(dados.nome)msg+=`👤 *Cliente:* ${dados.nome}\n`;
+    msg+="\n";
     msg+=items.map(i=>`• ${i.q}x ${i.n} — ${i.p}`).join("\n");
     msg+=`\n\n*Subtotal${AVISTA_ON?" (cartão)":""}: ${fmt(sub)}*`;
     if(retirada){
       msg+="\n🏪 *Retirada na loja* — Rua Juvêncio Vasconcelos, 385 A, Fortaleza/CE";
-    }else if(temFrete){
-      msg+=bLabel?`\nBairro: ${bLabel}`:"";
-      msg+=fi.frete===0?"\nFrete: grátis 🎉":`\nFrete: ${fmt(fi.frete)}`;
     }else{
-      msg+="\nEntrega: combinar o frete pelo meu bairro"+(bLabel?` (${bLabel})`:"");
+      const endr=[dados.rua&&`${dados.rua}${dados.num?`, ${dados.num}`:""}`,bLabel].filter(Boolean).join(" — ");
+      msg+=endr?`\n📍 *Endereço:* ${endr}`:"";
+      msg+=temFrete?(fi.frete===0?"\nFrete: grátis 🎉":`\nFrete: ${fmt(fi.frete)}`):"\nEntrega: combinar o frete pelo meu bairro";
     }
     msg+=`\n*Total${AVISTA_ON?" no cartão":""}: ${fmt(sub+freteVal)}*`;
     if(AVISTA_ON)msg+=`\n*Total à vista (Pix/dinheiro −6%): ${fmt(avista(sub)+freteVal)}*`;
@@ -723,13 +743,24 @@
   };
   const PER=24; let base=[], view=[], shown=0, curDept=cats[0].nome, sz="", pmin=0, pmax=1e9;
   const SIZES=["RN","P","M","G","XG","XXG","XXXG","Piscina","Geriátrica"];
+  // Fallback de tamanho: se o ERP não tagueou (p.t vazio), deduz do nome do produto.
+  // Só os tokens X inequívocos (XG/XXG/XXXG) p/ não confundir com pack/peso; XXXG é o pedido do Bosco.
+  function sizeTag(p){
+    if(p.t)return p.t;
+    if(p.d!=="Fraldas")return "";
+    const u=" "+(p.n||"").toUpperCase()+" ";
+    if(/[^A-Z]XXXG[^A-Z]/.test(u))return "XXXG";
+    if(/[^A-Z]XXG[^A-Z]/.test(u))return "XXG";
+    if(/[^A-Z]XG[^A-Z]/.test(u))return "XG";
+    return "";
+  }
 
   const card=(p)=>`<article class="prod" role="button" tabindex="0" aria-label="Ver detalhes: ${p.n}" onclick="openProd(${p.id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openProd(${p.id})}">
     ${p.e>0&&p.e<=5?'<span class="tag">Últimas</span>':''}
     <button class="fav-btn${favs.has(p.id)?' on':''}" aria-label="Favoritar ${p.n}" aria-pressed="${favs.has(p.id)}" onclick="event.stopPropagation();toggleFav(${p.id},this)">${favs.has(p.id)?'❤️':'🤍'}</button>
     <div class="pimg${p.f?' has-photo':''}">${p.f?`<img src="fotos/${p.f}" alt="${p.n}" loading="lazy" onerror="this.parentNode.classList.remove('has-photo');this.replaceWith(document.createTextNode(EMO['${p.d.replace(/'/g,"\\'")}']||'🛒'))">`:(EMO[p.d]||'🛒')}</div>
     <div class="pbody">
-      <div class="pcat">${p.d}${p.t?' · '+p.t:''}</div>
+      <div class="pcat">${p.d}${sizeTag(p)?' · '+sizeTag(p):''}</div>
       <div class="pname">${p.n}</div>
       ${AVISTA_ON?`<div class="price">${p.p} <span class="price-tag">no cartão</span></div>
       <div class="avista">💰 <b>${fmt(avista(p.v))}</b> à vista <span class="off">−6% Pix/dinheiro</span></div>`:`<div class="price">${p.p}</div>
@@ -740,7 +771,7 @@
   </article>`;
 
   function apply(){
-    view=base.filter(p=>p.v>=pmin&&p.v<=pmax&&(!sz||p.t===sz));
+    view=base.filter(p=>p.v>=pmin&&p.v<=pmax&&(!sz||sizeTag(p)===sz));
     paint(true);
   }
   function paint(reset){
@@ -792,6 +823,7 @@
   document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeProd();closeCart();}});
   renderPagamentos();
   renderBairros();
+  prefillDados();
   renderModo();
   renderFavBadge();
   (function renderMais(){
