@@ -166,7 +166,7 @@
     .fcols{grid-template-columns:1fr 1fr}
   }
   /* campo selecionável de departamento — só no mobile */
-  .catselect{display:none;margin-bottom:6px}
+  .catselect{display:block;margin-bottom:6px;max-width:440px}
   .catselect label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px}
   .catselect select{width:100%;padding:14px 16px;font-size:16px;font-weight:600;color:var(--navy);background:var(--panel);border:1.5px solid var(--mint);border-radius:14px;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2333A98F' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
   .catselect select:focus{outline:2px solid var(--mint-deep);outline-offset:2px}
@@ -174,8 +174,8 @@
     .hact .txt{display:none}.hcard h1{font-size:29px}.hside{grid-template-columns:1fr}
     .filters{grid-template-columns:1fr}.search{order:3;flex:1 0 100%}.hbar{flex-wrap:wrap;gap:12px}
     .fcols{grid-template-columns:1fr}.brand small{display:none}
-    /* categorias viram dropdown */
-    .catselect{display:block}.cats{display:none}
+    /* seletor de departamento ocupa a largura no mobile */
+    .catselect{max-width:none}
     /* 2 produtos por linha, cards compactos */
     .grid{grid-template-columns:repeat(2,1fr);gap:10px}
     .pbody{padding:11px}.pname{font-size:12.5px;min-height:34px;margin-bottom:6px}
@@ -372,10 +372,7 @@
   </div>
 
   <section class="catsec">
-    <h2>Compre por departamento</h2>
-    <p class="sub">Mais de 800 produtos organizados pra você achar rápido</p>
     <div class="catselect"><label for="catsel">Departamento</label><select id="catsel" onchange="showDept(this.value)" aria-label="Escolher departamento"></select></div>
-    <div class="cats" id="cats"></div>
   </section>
 
   <section class="shelf" id="shelf-top" style="display:none">
@@ -789,13 +786,13 @@
   window.setPreco=(a,b)=>{pmin=a;pmax=b;apply();};
   window.showDept=(d)=>{
     favView=false;
+    const todos=(d==="__todos__"||!d);
     curDept=d;sz="";document.getElementById("q").value="";
-    base=prods.filter(p=>p.d===d);
-    document.getElementById("lt").textContent=d;
+    base=todos?prods.slice():prods.filter(p=>p.d===d);
+    document.getElementById("lt").textContent=todos?"Todos os produtos":d;
     document.getElementById("sizebox").style.display=d==="Fraldas"?"block":"none";
-    document.querySelectorAll(".cat").forEach(c=>c.classList.toggle("on",c.dataset.d===d));
     document.querySelectorAll(".menu a").forEach(a=>a.classList.toggle("on",a.dataset.d===d));
-    const cs=document.getElementById("catsel"); if(cs)cs.value=d;
+    const cs=document.getElementById("catsel"); if(cs)cs.value=todos?"__todos__":d;
     document.querySelectorAll(".sz").forEach(s=>s.classList.remove("on"));
     apply();
     document.getElementById("produtos").scrollIntoView({behavior:"smooth"});
@@ -810,14 +807,13 @@
     apply();
   }
 
-  document.getElementById("cats").innerHTML=cats.map(c=>`<div class="cat" tabindex="0" role="button" data-d="${c.nome}" onclick="showDept('${c.nome.replace(/'/g,"\\'")}') " onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><div class="disc">${c.emoji}</div><b>${c.nome}</b><small>${c.n}</small></div>`).join("");
   document.getElementById("menu").innerHTML=cats.slice(0,9).map(c=>`<li><a tabindex="0" role="button" data-d="${c.nome}" onclick="showDept('${c.nome.replace(/'/g,"\\'")}') " onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">${c.nome}</a></li>`).join("");
-  document.getElementById("catsel").innerHTML=cats.map(c=>`<option value="${c.nome}">${c.emoji} ${c.nome} (${c.n})</option>`).join("");
+  document.getElementById("catsel").innerHTML='<option value="__todos__">🛍️ Todos os departamentos</option>'+cats.map(c=>`<option value="${c.nome}">${c.emoji} ${c.nome} (${c.n})</option>`).join("");
   document.getElementById("sizes").innerHTML=SIZES.map(s=>`<div class="sz" tabindex="0" role="button" onclick="pickSize(this,'${s}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">${s}</div>`).join("");
   window.pickSize=(el,s)=>{const on=el.classList.contains("on");document.querySelectorAll(".sz").forEach(x=>x.classList.remove("on"));if(!on){el.classList.add("on");sz=s;}else sz="";apply();};
   document.getElementById("more").onclick=()=>paint(false);
   let deb; document.getElementById("q").addEventListener("input",e=>{clearTimeout(deb);deb=setTimeout(()=>search(e.target.value),180);});
-  showDept(curDept);
+  showDept("__todos__");
 
   let toastT; window.toast=(m)=>{const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),1600);};
   document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeProd();closeCart();}});
