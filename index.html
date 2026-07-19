@@ -225,6 +225,13 @@
   .add:active{transform:scale(.97)}
   .add:focus-visible{outline:2px solid var(--navy);outline-offset:3px}
   .add.done{background:var(--navy)}
+  .add:disabled,.add[disabled]{background:#9CA3AF;cursor:not-allowed;opacity:.7}
+  .add:disabled:hover,.add[disabled]:hover{background:#9CA3AF;transform:none}
+  .tag-esgotado{position:absolute;top:8px;left:8px;background:#EF4444;color:#fff;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 8px;border-radius:999px;z-index:1}
+  .pv-add:disabled,.pv-add[disabled]{background:#9CA3AF;cursor:not-allowed;opacity:.7}
+  .pv-add:disabled:hover,.pv-add[disabled]:hover{background:#9CA3AF;transform:none}
+  .pv-wa:disabled,.pv-wa[disabled]{background:#9CA3AF;cursor:not-allowed;opacity:.7}
+  .pv-wa:disabled:hover,.pv-wa[disabled]:hover{background:#9CA3AF;transform:none}
   @media(max-width:640px){.add{min-height:48px;padding:13px;font-size:12px;gap:5px}}
   .cart-ov{position:fixed;inset:0;background:rgba(38,50,74,.5);z-index:60;opacity:0;pointer-events:none;transition:.2s}
   .cart-ov.open{opacity:1;pointer-events:auto}
@@ -541,6 +548,7 @@
 
   window.addCart=(id)=>{
     const p=prods[id]; if(!p)return;
+    if(p.esgotado){toast("Produto esgotado 😞");return;}
     if(!cart[id])cart[id]={n:p.n,p:p.p,v:p.v,f:p.f,d:p.d,q:0};
     cart[id].q++; saveCart(); updateCart(); toast("Adicionado ao carrinho 🛒");
     const b=document.querySelector(`.prod button.add[onclick="addCart(${id})"]`);
@@ -598,9 +606,9 @@
           <div class="pv-parc">💳 Pix, dinheiro ou cartão</div>`}
           <div class="pv-frete">🚚 Entrega em Fortaleza · frete pelo seu bairro · retirada grátis</div>
           <div class="pv-acts">
-            <button class="pv-add" onclick="addCart(${p.id});closeProd()">＋ Adicionar ao carrinho</button>
+            <button class="pv-add" ${p.esgotado?'disabled aria-disabled="true"':''} onclick="addCart(${p.id});closeProd()">${p.esgotado?'😞 Esgotado':'＋ Adicionar ao carrinho'}</button>
             <button class="pv-fav${favs.has(p.id)?' on':''}" aria-pressed="${favs.has(p.id)}" onclick="toggleFav(${p.id},null,this)">${favs.has(p.id)?'❤️ Favorito':'🤍 Favoritar'}</button>
-            <button class="pv-wa" onclick="pedir(${JSON.stringify(p.n)},${JSON.stringify(p.p)})">💬 Pedir no WhatsApp</button>
+            <button class="pv-wa" ${p.esgotado?'disabled aria-disabled="true"':''} onclick="pedir(${JSON.stringify(p.n)},${JSON.stringify(p.p)})">${p.esgotado?'😞 Produto esgotado':'💬 Pedir no WhatsApp'}</button>
           </div>
         </div>
       </div>`;
@@ -753,7 +761,7 @@
   }
 
   const card=(p)=>`<article class="prod" role="button" tabindex="0" aria-label="Ver detalhes: ${p.n}" onclick="openProd(${p.id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openProd(${p.id})}">
-    ${p.e>0&&p.e<=5?'<span class="tag">Últimas</span>':''}
+    ${p.esgotado?'<span class="tag-esgotado">Esgotado</span>':(p.e>0&&p.e<=5?'<span class="tag">Últimas</span>':'')}
     <button class="fav-btn${favs.has(p.id)?' on':''}" aria-label="Favoritar ${p.n}" aria-pressed="${favs.has(p.id)}" onclick="event.stopPropagation();toggleFav(${p.id},this)">${favs.has(p.id)?'❤️':'🤍'}</button>
     <div class="pimg${p.f?' has-photo':''}">${p.f?`<img src="fotos/${p.f}" alt="${p.n}" loading="lazy" onerror="this.parentNode.classList.remove('has-photo');this.replaceWith(document.createTextNode(EMO['${p.d.replace(/'/g,"\\'")}']||'🛒'))">`:(EMO[p.d]||'🛒')}</div>
     <div class="pbody">
@@ -763,7 +771,7 @@
       <div class="avista">💰 <b>${fmt(avista(p.v))}</b> à vista <span class="off">−6% Pix/dinheiro</span></div>`:`<div class="price">${p.p}</div>
       <div class="parc">💳 Pix, dinheiro ou cartão</div>`}
       <div class="frete-hint">🚚 Frete pelo seu bairro · retirada grátis na loja</div>
-      <button class="add" onclick="event.stopPropagation();addCart(${p.id})">＋ Adicionar</button>
+      <button class="add" ${p.esgotado?'disabled aria-disabled="true"':''} onclick="event.stopPropagation();addCart(${p.id})">${p.esgotado?'Esgotado':'＋ Adicionar'}</button>
     </div>
   </article>`;
 
