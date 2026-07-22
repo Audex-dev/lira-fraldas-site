@@ -341,6 +341,20 @@
   .cart-cta{width:100%;background:var(--wa);color:#fff;border:0;border-radius:12px;padding:15px;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s}
   .cart-cta:hover{background:var(--wa-deep)}
   .cart-cta:disabled{opacity:.45;cursor:not-allowed}
+  /* ===== Wizard 2 passos (itens -> entrega/pagamento) ===== */
+  .cart-step{flex:1;display:flex;flex-direction:column;min-height:0}
+  .cart-step[hidden]{display:none}   /* precisa vir DEPOIS do display:flex acima p/ o [hidden] valer */
+  .cart-step2-body{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:8px 18px 4px}
+  .cart-h-tit{min-width:0}
+  .cart-steps{display:flex;gap:6px;margin-top:7px}
+  .cart-steps .dot{width:24px;height:5px;border-radius:3px;background:rgba(38,50,74,.22);transition:.2s}
+  .cart-steps .dot.on{background:var(--navy-deep)}
+  .cart-next{background:#1A7A66}
+  .cart-next:hover{background:var(--mint-deep)}
+  .cart-btns{display:flex;gap:9px}
+  .cart-btns .cart-cta{flex:1}
+  .cart-back{flex:0 0 auto;background:#fff;border:1.5px solid var(--line);color:var(--navy);border-radius:12px;padding:15px 16px;font-size:14px;font-weight:800;cursor:pointer;transition:.15s}
+  .cart-back:hover{background:var(--mint-soft);border-color:var(--mint)}
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:12px 22px;border-radius:999px;font-size:14px;font-weight:600;z-index:70;opacity:0;pointer-events:none;transition:.22s;box-shadow:0 8px 24px rgba(38,50,74,.35)}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -505,41 +519,63 @@
 
 <!-- Carrinho -->
 <div class="cart-ov" id="cart-ov" onclick="closeCart()"></div>
-<aside class="cart-p" id="cart-p" role="dialog" aria-modal="true" aria-label="Carrinho de compras">
-  <div class="cart-h"><h3><span aria-hidden="true">🛒</span> Meu carrinho</h3><button class="cart-x" aria-label="Fechar carrinho" onclick="closeCart()">✕</button></div>
-  <div class="cart-list" id="cart-list"></div>
-  <div class="cart-f">
-    <div class="cart-pay">
-      <span>Forma de pagamento</span>
-      <div class="pays" id="pays" role="radiogroup" aria-label="Forma de pagamento"></div>
+<aside class="cart-p" id="cart-p" data-step="1" role="dialog" aria-modal="true" aria-label="Carrinho de compras">
+  <div class="cart-h">
+    <div class="cart-h-tit">
+      <h3><span aria-hidden="true">🛒</span> <span id="cart-title">Meu carrinho</span></h3>
+      <div class="cart-steps" id="cart-steps" aria-hidden="true"><span class="dot on"></span><span class="dot"></span></div>
     </div>
-    <div class="cart-sub"><span>Subtotal</span><b id="cart-total">R$ 0,00</b></div>
-    <div class="cart-dados">
-      <label for="cart-nome">Seus dados</label>
-      <input id="cart-nome" type="text" placeholder="Seu nome" autocomplete="name" oninput="setDado('nome',this.value)">
-      <input id="cart-fone" type="tel" inputmode="tel" placeholder="Seu WhatsApp (DDD + numero)" autocomplete="tel" style="width:100%;margin-top:7px" oninput="setDado('fone',this.value)">
+    <button class="cart-x" aria-label="Fechar carrinho" onclick="closeCart()">✕</button>
+  </div>
+
+  <!-- PASSO 1 — conferir os itens -->
+  <div class="cart-step" id="cart-step-1">
+    <div class="cart-list" id="cart-list"></div>
+    <div class="cart-f">
+      <div class="cart-sub"><span>Subtotal</span><b id="cart-total">R$ 0,00</b></div>
+      <button class="cart-cta cart-next" id="cart-next" onclick="goStep(2,true)">Continuar para a entrega →</button>
     </div>
-    <div class="cart-modo" role="radiogroup" aria-label="Como você quer receber">
-      <button type="button" class="modo on" id="modo-entrega" role="radio" aria-checked="true" onclick="setModo('entrega')">🛵 Entrega</button>
-      <button type="button" class="modo" id="modo-retirada" role="radio" aria-checked="false" onclick="setModo('retirada')">🏪 Retirar na loja</button>
-    </div>
-    <div class="cart-retirada" id="cart-retirada" hidden>🏪 <b>Retirada grátis na loja</b><br>Rua Juvêncio Vasconcelos, 385 A — Fortaleza/CE<br>🕐 Seg–Sex 8h–18h · Sáb 8h–12h</div>
-    <div class="cart-entrega" id="cart-entrega-box">
-      <label for="cart-cep">Entrega — qual seu bairro?</label>
-      <div class="cep-row">
-        <input id="cart-cep" inputmode="numeric" maxlength="9" placeholder="CEP (opcional)" oninput="maskCep(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();consultarCep()}">
-        <button type="button" onclick="consultarCep()">Buscar</button>
+  </div>
+
+  <!-- PASSO 2 — entrega e pagamento -->
+  <div class="cart-step" id="cart-step-2" hidden>
+    <div class="cart-step2-body">
+      <div class="cart-modo" role="radiogroup" aria-label="Como você quer receber">
+        <button type="button" class="modo on" id="modo-entrega" role="radio" aria-checked="true" onclick="setModo('entrega')">🛵 Entrega</button>
+        <button type="button" class="modo" id="modo-retirada" role="radio" aria-checked="false" onclick="setModo('retirada')">🏪 Retirar na loja</button>
       </div>
-      <select id="cart-bairro" aria-label="Bairro de entrega" onchange="setBairro(this.value)"></select>
-      <div class="end-row">
-        <input id="cart-rua" class="rua" type="text" placeholder="Rua / Av." autocomplete="address-line1" oninput="setDado('rua',this.value)">
-        <input id="cart-num" class="num" type="text" placeholder="Nº" inputmode="numeric" autocomplete="address-line2" oninput="setDado('num',this.value)">
+      <div class="cart-retirada" id="cart-retirada" hidden>🏪 <b>Retirada grátis na loja</b><br>Rua Juvêncio Vasconcelos, 385 A — Fortaleza/CE<br>🕐 Seg–Sex 8h–18h · Sáb 8h–12h</div>
+      <div class="cart-entrega" id="cart-entrega-box">
+        <label for="cart-cep">Entrega — qual seu bairro?</label>
+        <div class="cep-row">
+          <input id="cart-cep" inputmode="numeric" maxlength="9" placeholder="CEP (opcional)" oninput="maskCep(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();consultarCep()}">
+          <button type="button" onclick="consultarCep()">Buscar</button>
+        </div>
+        <select id="cart-bairro" aria-label="Bairro de entrega" onchange="setBairro(this.value)"></select>
+        <div class="end-row">
+          <input id="cart-rua" class="rua" type="text" placeholder="Rua / Av." autocomplete="address-line1" oninput="setDado('rua',this.value)">
+          <input id="cart-num" class="num" type="text" placeholder="Nº" inputmode="numeric" autocomplete="address-line2" oninput="setDado('num',this.value)">
+        </div>
+      </div>
+      <div class="cart-dados">
+        <label for="cart-nome">Seus dados</label>
+        <input id="cart-nome" type="text" placeholder="Seu nome" autocomplete="name" oninput="setDado('nome',this.value)">
+        <input id="cart-fone" type="tel" inputmode="tel" placeholder="Seu WhatsApp (DDD + numero)" autocomplete="tel" style="width:100%;margin-top:7px" oninput="setDado('fone',this.value)">
+      </div>
+      <div class="cart-pay">
+        <span>Forma de pagamento</span>
+        <div class="pays" id="pays" role="radiogroup" aria-label="Forma de pagamento"></div>
       </div>
     </div>
-    <div class="cart-frete" id="cart-frete"></div>
-    <div class="cart-sub cart-total-final"><span>Total no cartão</span><b id="cart-total-final">R$ 0,00</b></div>
-    <div class="cart-avista"><span>💳 No cartão (até 2x)</span><b id="cart-avista">R$ 0,00</b></div>
-    <button class="cart-cta" id="cart-cta" onclick="finalizarPedido()">💬 Finalizar pedido no WhatsApp</button>
+    <div class="cart-f">
+      <div class="cart-frete" id="cart-frete"></div>
+      <div class="cart-sub cart-total-final"><span>Total no cartão</span><b id="cart-total-final">R$ 0,00</b></div>
+      <div class="cart-avista"><span>💳 No cartão (até 2x)</span><b id="cart-avista">R$ 0,00</b></div>
+      <div class="cart-btns">
+        <button type="button" class="cart-back" onclick="goStep(1,true)">← Voltar</button>
+        <button class="cart-cta" id="cart-cta" onclick="finalizarPedido()">💬 Finalizar pedido no WhatsApp</button>
+      </div>
+    </div>
   </div>
 </aside>
 
@@ -642,10 +678,11 @@
     const cartP=document.getElementById("cart-p");
     cartP.classList.add("open");
     document.body.style.overflow="hidden";
+    goStep(1,false);   // toda abertura começa no passo 1 (conferir itens)
     setTimeout(()=>{
       const closeBtn=cartP.querySelector(".cart-x");
       if(closeBtn)closeBtn.focus();
-      const getFocusable=()=>Array.from(cartP.querySelectorAll('button,[href],input,[tabindex]:not([tabindex="-1"])'));
+      const getFocusable=()=>Array.from(cartP.querySelectorAll('button,[href],input,select,[tabindex]:not([tabindex="-1"])')).filter(el=>el.offsetParent!==null&&!el.disabled);
       _trapHandler=(e)=>{
         if(e.key!=="Tab")return;
         const els=getFocusable(); if(!els.length)return;
@@ -663,6 +700,18 @@
     cartP.classList.remove("open");
     document.body.style.overflow="";
     if(_cartTrigger&&_cartTrigger.focus){try{_cartTrigger.focus();}catch(e){}_cartTrigger=null;}
+  };
+  // ===== Wizard: passo 1 (itens) -> passo 2 (entrega/pagamento) =====
+  window.goStep=(n,focusFirst)=>{
+    const s1=document.getElementById("cart-step-1"),s2=document.getElementById("cart-step-2");
+    if(!s1||!s2)return;
+    if(n===2&&!cartCount())return;          // não avança com carrinho vazio
+    s1.hidden=n!==1; s2.hidden=n!==2;
+    document.getElementById("cart-p").dataset.step=n;
+    const t=document.getElementById("cart-title"); if(t)t.textContent=n===2?"Entrega e pagamento":"Meu carrinho";
+    document.querySelectorAll("#cart-steps .dot").forEach((d,i)=>d.classList.toggle("on",i<n));
+    const active=n===2?s2:s1, sc=active.querySelector(".cart-list,.cart-step2-body"); if(sc)sc.scrollTop=0;
+    if(focusFirst){const f=active.querySelector("button:not([disabled]),input:not([hidden]),select");if(f)try{f.focus();}catch(e){}}
   };
 
   // ===== Quick-view do produto (abre ao clicar no card) =====
@@ -782,6 +831,9 @@
     // produto); o frete não leva acréscimo — é serviço, não passa em adquirente.
     const av=document.getElementById("cart-avista"); if(av&&AVISTA_ON)av.textContent=fmt(cartTotalCartao()+(fi.frete||0));
     document.getElementById("cart-cta").disabled=!items.length;
+    const nx=document.getElementById("cart-next"); if(nx)nx.disabled=!items.length;
+    // esvaziou o carrinho estando no passo 2? volta pro passo 1
+    if(!items.length&&document.getElementById("cart-p")?.dataset.step==="2")goStep(1,false);
   }
 
   // ===== Forma de pagamento (aceitas pela loja; pronto p/ PinPDV) =====
