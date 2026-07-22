@@ -671,9 +671,9 @@
         <div class="pv-info">
           <div class="pv-cat">${p.d}${sizeTag(p)?' · '+sizeTag(p):''}</div>
           <div class="pv-name">${p.n}</div>
-          ${AVISTA_ON&&precoCartao(p)?`<div class="pv-price">${p.p} <span class="price-tag">à vista</span></div>
-          <div class="pv-avista">💰 no Pix ou dinheiro</div>
-          <div class="pv-parc">💳 <b>${fmt(p.c)}</b> no cartão · até ${MAX_PARCELAS}x de ${fmt(parcelaDe(p.c))}</div>`:`<div class="pv-price">${p.p}</div>
+          ${AVISTA_ON&&precoCartao(p)?`<div class="pv-price">${p.p} <span class="price-tag">Pix/dinheiro</span></div>
+          <div class="pv-avista">💳 ou até ${MAX_PARCELAS}x de <b>${fmt(parcelaDe(p.c))}</b></div>
+          <div class="pv-parc">${fmt(p.c)} no cartão</div>`:`<div class="pv-price">${p.p}</div>
           <div class="pv-parc">💳 Pix, dinheiro ou cartão</div>`}
           <div class="pv-frete">🚚 Entrega em Fortaleza · frete pelo seu bairro · retirada grátis</div>
           <div class="pv-acts">
@@ -840,8 +840,8 @@
     <div class="pbody">
       <div class="pcat">${p.d}${sizeTag(p)?' · '+sizeTag(p):''}</div>
       <div class="pname">${p.n}</div>
-      ${AVISTA_ON&&precoCartao(p)?`<div class="price">${p.p} <span class="price-tag">à vista</span></div>
-      <div class="parc">💳 ${fmt(p.c)} no cartão · até ${MAX_PARCELAS}x de ${fmt(parcelaDe(p.c))}</div>`:`<div class="price">${p.p}</div>
+      ${AVISTA_ON&&precoCartao(p)?`<div class="price">${p.p} <span class="price-tag">Pix/dinheiro</span></div>
+      <div class="parc">💳 ou até ${MAX_PARCELAS}x de ${fmt(parcelaDe(p.c))} <span class="off">(${fmt(p.c)} no cartão)</span></div>`:`<div class="price">${p.p}</div>
       <div class="parc">💳 Pix, dinheiro ou cartão</div>`}
       <div class="frete-hint">🚚 Frete pelo seu bairro · retirada grátis na loja</div>
       <button class="add" ${p.esgotado?'disabled aria-disabled="true"':''} onclick="event.stopPropagation();addCart(${p.id})">${p.esgotado?'Esgotado':'＋ Adicionar'}</button>
