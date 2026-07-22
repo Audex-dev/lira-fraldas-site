@@ -517,6 +517,7 @@
     <div class="cart-dados">
       <label for="cart-nome">Seus dados</label>
       <input id="cart-nome" type="text" placeholder="Seu nome" autocomplete="name" oninput="setDado('nome',this.value)">
+      <input id="cart-fone" type="tel" inputmode="tel" placeholder="Seu WhatsApp (DDD + numero)" autocomplete="tel" style="width:100%;margin-top:7px" oninput="setDado('fone',this.value)">
     </div>
     <div class="cart-modo" role="radiogroup" aria-label="Como você quer receber">
       <button type="button" class="modo on" id="modo-entrega" role="radio" aria-checked="true" onclick="setModo('entrega')">🛵 Entrega</button>
@@ -553,6 +554,14 @@
 <script src="fretes.js?v=20260707"></script>
 <script>
   const WA="5585999587768"; // WhatsApp oficial da Lira Fraldas
+  // API do ERP para registrar o pre-pedido. Trocar quando o lirafraldas.com.br
+  // voltar do Registro.br (hoje NXDOMAIN — ver P-690).
+  const API_BASE="https://erp-lira.audex.com.br";
+  // Chave publica do site (Empresa.siteApiKey). Fica visivel no JS por
+  // natureza — site estatico. So permite CRIAR pre-venda PENDENTE, e a rota
+  // tem rate-limit; o abuso possivel e spam de pedido, nao vazamento de dado.
+  const SITE_KEY="lira_a96d4d6e4c22f773bcf01374d00ba4118f260afebfdb62d9";
+
   function pedir(nome,preco){window.open(`https://wa.me/${WA}?text=`+encodeURIComponent(`Olá, Lira Fraldas! 👋 Quero comprar: *${nome}* — ${preco}. Qual a disponibilidade e como pagar?`),"_blank");}
   function pedirGeral(){window.open(`https://wa.me/${WA}?text=`+encodeURIComponent("Olá, Lira Fraldas! Gostaria de tirar uma dúvida / fazer um pedido."),"_blank");}
   function pedirCha(){window.open(`https://wa.me/${WA}?text=`+encodeURIComponent("Olá, Lira Fraldas! 🍼 Quero organizar um chá de fralda. Podem me ajudar com a lista e as fraldas?"),"_blank");}
@@ -703,9 +712,9 @@
   }
   window.setBairro=(k)=>{bairroEntrega=k||"";localStorage.setItem("lira-bairro",bairroEntrega);updateCart();};
   // ===== Dados do cliente (nome + endereço) — persistidos e enviados no pedido =====
-  const dados={nome:localStorage.getItem("lira-nome")||"",rua:localStorage.getItem("lira-rua")||"",num:localStorage.getItem("lira-num")||""};
+  const dados={nome:localStorage.getItem("lira-nome")||"",fone:localStorage.getItem("lira-fone")||"",rua:localStorage.getItem("lira-rua")||"",num:localStorage.getItem("lira-num")||""};
   window.setDado=(k,v)=>{dados[k]=(v||"").trim();localStorage.setItem("lira-"+k,dados[k]);};
-  function prefillDados(){const map={nome:"cart-nome",rua:"cart-rua",num:"cart-num"};for(const k in map){const el=document.getElementById(map[k]);if(el&&dados[k])el.value=dados[k];}}
+  function prefillDados(){const map={nome:"cart-nome",fone:"cart-fone",rua:"cart-rua",num:"cart-num"};for(const k in map){const el=document.getElementById(map[k]);if(el&&dados[k])el.value=dados[k];}}
   // ===== Entrega x Retirada na loja =====
   let modoEntrega=localStorage.getItem("lira-modo")||"entrega";
   function renderModo(){
@@ -817,7 +826,51 @@
     msg+=`\n*Total${AVISTA_ON?" à vista (Pix ou dinheiro)":""}: ${fmt(sub+freteVal)}*`;
     if(AVISTA_ON)msg+=`\n*Total no cartão: ${fmt(cartTotalCartao()+freteVal)}* (até ${MAX_PARCELAS}x de ${fmt(parcelaDe(cartTotalCartao()+freteVal))})`;
     msg+="\nForma de pagamento: "+(pg?pg.t:"(a combinar)");
-    window.open(`https://wa.me/${WA}?text=`+encodeURIComponent(msg),"_blank");
+
+    // ── Pre-pedido no ERP (best-effort) ─────────────────────────────────────
+    // Registra o pedido como PRE-VENDA (status PENDENTE, canal SITE) e poe o
+    // NUMERO na mensagem — e por ele que a vendedora acha o pedido na inbox do
+    // PDV e fecha sem redigitar nada.
+    //
+    // BEST-EFFORT DE PROPOSITO: se a API estiver fora, o CORS barrar, faltar
+    // telefone ou o produto nao tiver id, o WhatsApp abre exatamente como hoje.
+    // A integracao NUNCA pode impedir o cliente de mandar o pedido.
+    const abrirWhats=(txt)=>window.open(`https://wa.me/${WA}?text=`+encodeURIComponent(txt),"_blank");
+    const fone=(dados.fone||"").replace(/\D/g,"");
+    const itensApi=items.filter(i=>i.i).map(i=>({produtoId:i.i,quantidade:i.q}));
+    if(!API_BASE||!SITE_KEY||fone.length<10||itensApi.length!==items.length){ abrirWhats(msg); return; }
+
+    // Abre a aba ANTES do await: browser bloqueia popup aberto depois de
+    // promessa resolvida (o clique ja "esfriou"). Depois so ajusta a URL.
+    const aba=window.open("","_blank");
+    const entrega=retirada
+      ? {tipo:"RETIRADA"}
+      : {tipo:"ENTREGA",bairro:bLabel||undefined,
+         endereco:[dados.rua&&`${dados.rua}${dados.num?`, ${dados.num}`:""}`].filter(Boolean).join("")||undefined,
+         cidade:"Fortaleza",uf:"CE"};
+    const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),8000);
+    fetch(`${API_BASE}/api/public/pedidos`,{
+      method:"POST",signal:ctrl.signal,
+      headers:{"Content-Type":"application/json","x-site-api-key":SITE_KEY},
+      body:JSON.stringify({
+        itens:itensApi,
+        cliente:{nome:dados.nome||"Cliente do site",telefone:fone},
+        entrega,
+        observacao:(pg?`Forma preferida: ${pg.t}`:"").slice(0,500),
+        idempotencyKey:`site-${Date.now()}-${Math.random().toString(36).slice(2,10)}`
+      })
+    }).then(r=>r.ok?r.json():null).then(j=>{
+      clearTimeout(t);
+      const txt=(j&&j.numero)
+        ? `*PEDIDO #${j.numero}* (ja registrado no sistema)\n\n`+msg
+        : msg;
+      if(aba) aba.location.href=`https://wa.me/${WA}?text=`+encodeURIComponent(txt);
+      else abrirWhats(txt);
+    }).catch(()=>{
+      clearTimeout(t);
+      if(aba) aba.location.href=`https://wa.me/${WA}?text=`+encodeURIComponent(msg);
+      else abrirWhats(msg);
+    });
   };
   const PER=24; let base=[], view=[], shown=0, curDept=cats[0].nome, sz="", pmin=0, pmax=1e9;
   const SIZES=["RN","P","M","G","XG","XXG","XXXG","Piscina","Geriátrica"];
