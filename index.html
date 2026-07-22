@@ -537,7 +537,7 @@
     </div>
     <div class="cart-frete" id="cart-frete"></div>
     <div class="cart-sub cart-total-final"><span>Total no cartão</span><b id="cart-total-final">R$ 0,00</b></div>
-    <div class="cart-avista"><span>💰 À vista (Pix/dinheiro) −6%</span><b id="cart-avista">R$ 0,00</b></div>
+    <div class="cart-avista"><span>💳 No cartão (até 2x)</span><b id="cart-avista">R$ 0,00</b></div>
     <button class="cart-cta" id="cart-cta" onclick="finalizarPedido()">💬 Finalizar pedido no WhatsApp</button>
   </div>
 </aside>
@@ -595,12 +595,23 @@
   let cart={};
   try{cart=JSON.parse(localStorage.getItem("lira-cart")||"{}")||{};}catch(e){cart={};}
   const fmt=(v)=>"R$ "+v.toFixed(2).replace(".",",");
-  // Preço à vista (Pix/dinheiro) = preço de venda (cartão) com desconto automático.
-  // AVISTA_ON: LIGAR (true) só depois que o Bosco subir os preços +6% no ERP.
-  // Enquanto false, o site mostra só o preço normal (sem à vista), pra não exibir
-  // preço 6% menor sobre os preços atuais. Ver [[PENDENCIAS]] P-340.
-  const AVISTA_ON=false;
-  const DESC_AVISTA=0.06; const avista=(v)=>v*(1-DESC_AVISTA);
+  // ===== Preço à vista × cartão =====
+  // O preço BASE do catálogo (p.v) é o À VISTA — dinheiro, Pix ou vale.
+  // O preço de CARTÃO (débito/crédito/link) vem do campo `c`, calculado no
+  // ERP pela LISTA DE PREÇO e materializado pelo rebuild — NÃO é fórmula aqui.
+  // Isso é deliberado: fórmula no front divergiria do que o balcão cobra.
+  // Sem lista configurada no ERP o campo `c` não vem, DUPLO se auto-desliga
+  // e o site mostra um preço só, exatamente como antes.
+  const precoCartao=(p)=>(p&&p.c>p.v)?p.c:null;
+  // Liga sozinho quando o rebuild trouxer preço de cartão em algum produto.
+  const AVISTA_ON=prods.some(p=>p.c&&p.c>p.v);
+  const MAX_PARCELAS=2;                      // "em até 2x" — pedido do Bosco
+  // Arredonda a parcela PRA CIMA: 26,99/2 = 13,495 → mostra 13,50, não 13,49
+  // (13,49×2 = 26,98 anunciaria um centavo a menos do que se cobra).
+  const parcelaDe=(v)=>Math.ceil((v/MAX_PARCELAS)*100)/100;
+  // Total do carrinho no cartão: soma item a item pelo preço de cartão de CADA
+  // produto (um item pode ter exceção de preço e outro não) — nunca por % global.
+  const cartTotalCartao=()=>Object.values(cart).reduce((s,i)=>s+((i.c&&i.c>i.v)?i.c:i.v)*i.q,0);
   const cartCount=()=>Object.values(cart).reduce((s,i)=>s+i.q,0);
   const cartTotal=()=>Object.values(cart).reduce((s,i)=>s+i.v*i.q,0);
   const saveCart=()=>localStorage.setItem("lira-cart",JSON.stringify(cart));
@@ -608,7 +619,7 @@
   window.addCart=(id)=>{
     const p=prods[id]; if(!p)return;
     if(p.esgotado){toast("Produto esgotado 😞");return;}
-    if(!cart[id])cart[id]={n:p.n,p:p.p,v:p.v,f:p.f,d:p.d,q:0};
+    if(!cart[id])cart[id]={n:p.n,p:p.p,v:p.v,c:p.c,f:p.f,d:p.d,q:0};
     cart[id].q++; saveCart(); updateCart(); toast("Adicionado ao carrinho 🛒");
     const b=document.querySelector(`.prod button.add[onclick="addCart(${id})"]`);
     if(b){b.textContent="✓ Adicionado";b.classList.add("done");setTimeout(()=>{b.textContent="＋ Adicionar";b.classList.remove("done");},1100);}
@@ -660,8 +671,9 @@
         <div class="pv-info">
           <div class="pv-cat">${p.d}${sizeTag(p)?' · '+sizeTag(p):''}</div>
           <div class="pv-name">${p.n}</div>
-          ${AVISTA_ON?`<div class="pv-price">${p.p} <span class="price-tag">no cartão</span></div>
-          <div class="pv-avista">💰 <b>${fmt(avista(p.v))}</b> à vista <span class="off">−6% no Pix/dinheiro</span></div>`:`<div class="pv-price">${p.p}</div>
+          ${AVISTA_ON&&precoCartao(p)?`<div class="pv-price">${p.p} <span class="price-tag">à vista</span></div>
+          <div class="pv-avista">💰 no Pix ou dinheiro</div>
+          <div class="pv-parc">💳 <b>${fmt(p.c)}</b> no cartão · até ${MAX_PARCELAS}x de ${fmt(parcelaDe(p.c))}</div>`:`<div class="pv-price">${p.p}</div>
           <div class="pv-parc">💳 Pix, dinheiro ou cartão</div>`}
           <div class="pv-frete">🚚 Entrega em Fortaleza · frete pelo seu bairro · retirada grátis</div>
           <div class="pv-acts">
@@ -755,9 +767,11 @@
     document.getElementById("cart-total").textContent=fmt(sub);
     const fr=document.getElementById("cart-frete"); fr.textContent=fi.txt; fr.className="cart-frete"+(fi.cls?" "+fi.cls:""); fr.style.display=retirada?"none":"";
     const tf=document.getElementById("cart-total-final"); if(tf)tf.textContent=fmt(sub+(fi.frete||0));
-    const tfl=document.querySelector(".cart-total-final span"); if(tfl)tfl.textContent=AVISTA_ON?"Total no cartão":"Total";
+    const tfl=document.querySelector(".cart-total-final span"); if(tfl)tfl.textContent=AVISTA_ON?"Total à vista":"Total";
     const avRow=document.querySelector(".cart-avista"); if(avRow)avRow.style.display=AVISTA_ON?"":"none";
-    const av=document.getElementById("cart-avista"); if(av&&AVISTA_ON)av.textContent=fmt(avista(sub)+(fi.frete||0));
+    // Total no cartão soma o preço de cartão de CADA item (respeita exceção por
+    // produto); o frete não leva acréscimo — é serviço, não passa em adquirente.
+    const av=document.getElementById("cart-avista"); if(av&&AVISTA_ON)av.textContent=fmt(cartTotalCartao()+(fi.frete||0));
     document.getElementById("cart-cta").disabled=!items.length;
   }
 
@@ -792,7 +806,7 @@
     if(dados.nome)msg+=`👤 *Cliente:* ${dados.nome}\n`;
     msg+="\n";
     msg+=items.map(i=>`• ${i.q}x ${i.n} — ${i.p}`).join("\n");
-    msg+=`\n\n*Subtotal${AVISTA_ON?" (cartão)":""}: ${fmt(sub)}*`;
+    msg+=`\n\n*Subtotal${AVISTA_ON?" (à vista)":""}: ${fmt(sub)}*`;
     if(retirada){
       msg+="\n🏪 *Retirada na loja* — Rua Juvêncio Vasconcelos, 385 A, Fortaleza/CE";
     }else{
@@ -800,8 +814,8 @@
       msg+=endr?`\n📍 *Endereço:* ${endr}`:"";
       msg+=temFrete?(fi.frete===0?"\nFrete: grátis 🎉":`\nFrete: ${fmt(fi.frete)}`):"\nEntrega: combinar o frete pelo meu bairro";
     }
-    msg+=`\n*Total${AVISTA_ON?" no cartão":""}: ${fmt(sub+freteVal)}*`;
-    if(AVISTA_ON)msg+=`\n*Total à vista (Pix/dinheiro −6%): ${fmt(avista(sub)+freteVal)}*`;
+    msg+=`\n*Total${AVISTA_ON?" à vista (Pix ou dinheiro)":""}: ${fmt(sub+freteVal)}*`;
+    if(AVISTA_ON)msg+=`\n*Total no cartão: ${fmt(cartTotalCartao()+freteVal)}* (até ${MAX_PARCELAS}x de ${fmt(parcelaDe(cartTotalCartao()+freteVal))})`;
     msg+="\nForma de pagamento: "+(pg?pg.t:"(a combinar)");
     window.open(`https://wa.me/${WA}?text=`+encodeURIComponent(msg),"_blank");
   };
@@ -826,8 +840,8 @@
     <div class="pbody">
       <div class="pcat">${p.d}${sizeTag(p)?' · '+sizeTag(p):''}</div>
       <div class="pname">${p.n}</div>
-      ${AVISTA_ON?`<div class="price">${p.p} <span class="price-tag">no cartão</span></div>
-      <div class="avista">💰 <b>${fmt(avista(p.v))}</b> à vista <span class="off">−6% Pix/dinheiro</span></div>`:`<div class="price">${p.p}</div>
+      ${AVISTA_ON&&precoCartao(p)?`<div class="price">${p.p} <span class="price-tag">à vista</span></div>
+      <div class="parc">💳 ${fmt(p.c)} no cartão · até ${MAX_PARCELAS}x de ${fmt(parcelaDe(p.c))}</div>`:`<div class="price">${p.p}</div>
       <div class="parc">💳 Pix, dinheiro ou cartão</div>`}
       <div class="frete-hint">🚚 Frete pelo seu bairro · retirada grátis na loja</div>
       <button class="add" ${p.esgotado?'disabled aria-disabled="true"':''} onclick="event.stopPropagation();addCart(${p.id})">${p.esgotado?'Esgotado':'＋ Adicionar'}</button>
