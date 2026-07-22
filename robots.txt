@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Maquetes antigas da escolha de template (2026-07-02) — continuam publicadas,
+# mas são quase-duplicatas da home e não devem competir com ela na busca.
+Disallow: /01-mercadao.html
+Disallow: /02-loja-pratica.html
+Disallow: /03-boutique.html
+
+Sitemap: https://lira-fraldas.pages.dev/sitemap.xml
