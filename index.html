@@ -660,11 +660,15 @@
   const cartCount=()=>Object.values(cart).reduce((s,i)=>s+i.q,0);
   const cartTotal=()=>Object.values(cart).reduce((s,i)=>s+i.v*i.q,0);
   const saveCart=()=>localStorage.setItem("lira-cart",JSON.stringify(cart));
+  // Backfill do id do ERP em carrinhos salvos ANTES deste fix (best-effort, casa por nome).
+  // Sem isso, um cliente com carrinho antigo cairia no fallback WhatsApp puro (pré-pedido não sairia).
+  (function backfillCartId(){let mud=false;for(const k in cart){if(!cart[k].i){const m=prods.find(x=>x.n===cart[k].n);if(m){cart[k].i=m.i;mud=true;}}}if(mud)saveCart();})();
 
   window.addCart=(id)=>{
     const p=prods[id]; if(!p)return;
     if(p.esgotado){toast("Produto esgotado 😞");return;}
-    if(!cart[id])cart[id]={n:p.n,p:p.p,v:p.v,c:p.c,f:p.f,d:p.d,q:0};
+    if(!cart[id])cart[id]={i:p.i,n:p.n,p:p.p,v:p.v,c:p.c,f:p.f,d:p.d,q:0};
+    else if(!cart[id].i)cart[id].i=p.i;   // item salvo antes do fix ganha o id do ERP ao re-adicionar
     cart[id].q++; saveCart(); updateCart(); toast("Adicionado ao carrinho 🛒");
     const b=document.querySelector(`.prod button.add[onclick="addCart(${id})"]`);
     if(b){b.textContent="✓ Adicionado";b.classList.add("done");setTimeout(()=>{b.textContent="＋ Adicionar";b.classList.remove("done");},1100);}
