@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Minha Conta — Lira Fraldas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#33A98F">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-180.png">
+<meta name="robots" content="noindex,nofollow">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Lira Fraldas">
+<style>
+  :root{
+    --navy:#33415A; --navy-deep:#26324A; --ink:#33415A; --muted:#5A6A82;
+    --mint:#5FC7B0; --mint-deep:#33A98F; --mint-soft:#E6F7F2;
+    --pink:#F0919C; --pink-deep:#E06E7D;
+    --c-mint:#CDEFE7; --c-pink:#FBDDE2; --c-peach:#FCE6D2;
+    --c-yellow:#FBEFC9; --c-lilac:#E7DEF7; --c-sky:#D5EEF4;
+    --rainbow: linear-gradient(90deg,
+      var(--c-pink) 0%, var(--c-peach) 9%, var(--c-yellow) 17%, var(--c-mint) 26%,
+      var(--c-sky) 35%, var(--c-lilac) 44%, var(--c-pink) 53%, var(--c-peach) 61%,
+      var(--c-yellow) 69%, var(--c-mint) 78%, var(--c-sky) 87%, var(--c-lilac) 100%);
+    --bg:#FFFFFF; --panel:#F5FBF9; --line:#E2EFEB;
+    --r:20px; --shadow:0 8px 22px rgba(51,65,90,.10);
+    --font:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+    --amber:#B45309; --amber-bg:#FEF3C7;
+    --green:#15803D; --green-bg:#DCFCE7;
+    --gray:#6B7280; --gray-bg:#F3F4F6;
+    --red:#DC2626; --red-bg:#FEE2E2;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;overflow-x:hidden}
+  body{margin:0;font-family:var(--font);color:var(--ink);background:var(--bg);line-height:1.5;overscroll-behavior-y:none;min-height:100vh;display:flex;flex-direction:column}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%}
+
+  /* === Header (idêntico ao index) === */
+  .top{background:var(--navy);color:#fff;font-size:13px;font-weight:600;text-align:center;padding:8px}
+  header{background:var(--rainbow);color:var(--navy-deep)}
+  .hbar{display:flex;align-items:center;gap:18px;padding:13px 18px;max-width:1180px;margin:0 auto}
+  @supports(padding:max(0px)){
+    .hbar{padding-left:max(18px,env(safe-area-inset-left));padding-right:max(18px,env(safe-area-inset-right))}
+  }
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:20px;letter-spacing:-.3px;white-space:nowrap;text-decoration:none;color:inherit}
+  .brand img{width:52px;height:52px;border-radius:50%;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+  .brand small{display:block;font-size:11px;font-weight:600;opacity:.9}
+  .back-link{margin-left:auto;display:flex;align-items:center;gap:6px;font-weight:600;font-size:14px;color:var(--navy-deep);background:rgba(255,255,255,.55);border-radius:999px;padding:7px 15px;transition:.15s;white-space:nowrap}
+  .back-link:hover{background:rgba(255,255,255,.85)}
+  .back-link:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+
+  /* === Layout central === */
+  .page-wrap{flex:1;max-width:520px;width:100%;margin:32px auto 48px;padding:0 18px}
+  @supports(padding:max(0px)){
+    .page-wrap{padding-left:max(18px,env(safe-area-inset-left));padding-right:max(18px,env(safe-area-inset-right))}
+  }
+
+  /* === Telas (login / primeiro acesso / histórico) === */
+  .screen{display:none}
+  .screen.active{display:block}
+
+  /* === Card container === */
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:32px 28px;box-shadow:var(--shadow)}
+  @media(max-width:480px){.card{padding:24px 18px;border-radius:16px}}
+
+  .card-title{margin:0 0 6px;font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.3px}
+  .card-sub{margin:0 0 26px;font-size:15px;color:var(--muted)}
+
+  /* === Formulário === */
+  .field{margin-bottom:18px}
+  .field label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin-bottom:6px}
+  .field input{width:100%;padding:13px 15px;border:1.5px solid var(--line);border-radius:12px;font-size:15px;color:var(--ink);background:#fff;outline:none;transition:.15s;font-family:var(--font)}
+  .field input:focus{border-color:var(--mint-deep);box-shadow:0 0 0 3px rgba(51,169,143,.15)}
+  .field input::placeholder{color:#9BAAB8}
+
+  /* === Botão principal (estilo .cart-cta) === */
+  .btn-main{width:100%;background:var(--mint-deep);color:#fff;border:0;border-radius:12px;padding:15px;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:.15s;font-family:var(--font)}
+  .btn-main:hover{background:#1A7A66}
+  .btn-main:active{transform:scale(.98)}
+  .btn-main:focus-visible{outline:2px solid var(--navy);outline-offset:3px}
+  .btn-main:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+  .btn-ghost{width:100%;background:#fff;border:1.5px solid var(--line);color:var(--navy);border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:.15s;font-family:var(--font);margin-top:10px}
+  .btn-ghost:hover{background:var(--mint-soft);border-color:var(--mint)}
+  .btn-ghost:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+
+  /* === Links de texto === */
+  .text-links{margin-top:20px;display:flex;flex-direction:column;gap:8px;align-items:center}
+  .text-link{background:none;border:none;color:var(--mint-deep);font-size:14px;font-weight:600;cursor:pointer;padding:4px;font-family:var(--font);text-decoration:underline;text-decoration-color:transparent;transition:.15s}
+  .text-link:hover{text-decoration-color:var(--mint-deep)}
+  .text-link:focus-visible{outline:2px solid var(--mint-deep);outline-offset:2px;border-radius:4px}
+
+  /* === Código de verificação === */
+  .codigo-box{background:var(--mint-soft);border:2px solid var(--mint);border-radius:16px;padding:20px 24px;text-align:center;margin:20px 0}
+  .codigo-label{font-size:12px;font-weight:700;color:var(--mint-deep);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+  .codigo-val{font-size:36px;font-weight:800;color:var(--navy);letter-spacing:4px;font-variant-numeric:tabular-nums}
+  .codigo-hint{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.4}
+
+  .telefone-hint{font-size:13px;color:var(--muted);text-align:center;margin-bottom:16px}
+  .telefone-hint b{color:var(--navy)}
+
+  /* === Status de verificação === */
+  .status-poll{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:600;margin:16px 0}
+  .status-poll.pendente{background:var(--amber-bg);color:var(--amber)}
+  .status-poll.confirmado{background:var(--green-bg);color:var(--green)}
+  .status-poll.expirado{background:var(--red-bg);color:var(--red)}
+  .status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+  .pendente .status-dot{background:var(--amber);animation:pulse 1.4s ease-in-out infinite}
+  .confirmado .status-dot{background:var(--green)}
+  .expirado .status-dot{background:var(--red)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+  /* === Histórico === */
+  .hist-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+  .hist-saudacao{font-size:22px;font-weight:800;color:var(--navy);margin:0}
+  .hist-sub{font-size:14px;color:var(--muted);margin:4px 0 0}
+  .btn-sair{background:none;border:1.5px solid var(--line);color:var(--muted);border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;transition:.15s}
+  .btn-sair:hover{border-color:var(--pink);color:var(--pink-deep)}
+  .btn-sair:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+
+  .pedido-list{display:flex;flex-direction:column;gap:12px}
+  .pedido{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;transition:.12s}
+  .pedido:hover{box-shadow:var(--shadow)}
+  .pedido-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+  .pedido-num{font-size:15px;font-weight:800;color:var(--navy)}
+  .pedido-data{font-size:13px;color:var(--muted)}
+  .pedido-mid{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+  .pedido-total{font-size:18px;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums}
+  .pedido-info{font-size:13px;color:var(--muted);margin-top:4px}
+
+  /* === Badges de status === */
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;letter-spacing:.2px;white-space:nowrap}
+  .badge-amber{background:var(--amber-bg);color:var(--amber)}
+  .badge-green{background:var(--green-bg);color:var(--green)}
+  .badge-gray{background:var(--gray-bg);color:var(--gray)}
+  .badge-red{background:var(--red-bg);color:var(--red)}
+
+  /* === Estado vazio histórico === */
+  .empty-hist{text-align:center;padding:40px 24px}
+  .empty-hist .empty-icon{font-size:56px;margin-bottom:16px}
+  .empty-hist p{color:var(--muted);font-size:15px;margin:0 0 20px}
+  .empty-hist a{color:var(--mint-deep);font-weight:700;text-decoration:underline}
+
+  /* === Spinner === */
+  .spinner{width:20px;height:20px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spinner-page{display:flex;justify-content:center;padding:48px 0}
+  .spinner-page .sp{width:36px;height:36px;border:3.5px solid var(--line);border-top-color:var(--mint-deep);border-radius:50%;animation:spin .7s linear infinite}
+
+  /* === Alert inline === */
+  .alert{border-radius:10px;padding:12px 15px;font-size:14px;font-weight:600;margin-top:16px;line-height:1.45;display:none}
+  .alert.show{display:block}
+  .alert-error{background:var(--red-bg);color:var(--red)}
+  .alert-info{background:var(--mint-soft);color:var(--mint-deep)}
+
+  /* === Footer slim === */
+  footer.slim{background:var(--navy);color:#8b97ad;padding:18px;text-align:center;font-size:12px;margin-top:auto}
+  footer.slim a{color:#b9c4d6}
+
+  /* === Mobile === */
+  @media(max-width:480px){
+    .page-wrap{margin-top:20px;margin-bottom:32px}
+    .brand small{display:none}
+    .back-link span.txt{display:none}
+    .hist-saudacao{font-size:19px}
+    .pedido-total{font-size:16px}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<!-- top bar idêntica ao index -->
+<div class="top">🛍️ Área do cliente — Lira Fraldas</div>
+
+<header>
+  <div class="hbar">
+    <a class="brand" href="index.html" aria-label="Lira Fraldas — início">
+      <img src="logo.png" alt="Lira Fraldas">
+      <span>Lira Fraldas<small>Fraldas e cosméticos</small></span>
+    </a>
+    <a class="back-link" href="index.html" aria-label="Voltar à loja">
+      ← <span class="txt">Voltar à loja</span>
+    </a>
+  </div>
+</header>
+
+<main class="page-wrap" id="main">
+
+  <!-- ======================================================
+       TELA 1 — Login
+  ====================================================== -->
+  <div class="screen" id="screen-login">
+    <div class="card">
+      <h1 class="card-title">Entrar na sua conta</h1>
+      <p class="card-sub">Acesse seus pedidos e histórico de compras.</p>
+
+      <form id="form-login" onsubmit="handleLogin(event)">
+        <div class="field">
+          <label for="login-cpf">CPF</label>
+          <input type="text" id="login-cpf" name="cpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14" autocomplete="username" required aria-required="true">
+        </div>
+        <div class="field">
+          <label for="login-senha">Senha</label>
+          <input type="password" id="login-senha" name="senha" placeholder="Sua senha" autocomplete="current-password" required aria-required="true">
+        </div>
+        <div class="alert alert-error" id="alert-login" role="alert" aria-live="polite"></div>
+        <button class="btn-main" type="submit" id="btn-login">
+          <span id="btn-login-txt">Entrar</span>
+        </button>
+      </form>
+
+      <div class="text-links">
+        <button class="text-link" type="button" onclick="goScreen('screen-primeiro-acesso')">Primeira vez? Criar acesso</button>
+        <button class="text-link" type="button" onclick="goScreen('screen-primeiro-acesso')">Esqueci a senha</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================
+       TELA 2 — Primeiro acesso / recuperar senha
+  ====================================================== -->
+  <div class="screen" id="screen-primeiro-acesso">
+    <div class="card">
+
+      <!-- Passo 2a: pedir CPF -->
+      <div id="pa-step-cpf">
+        <h1 class="card-title">Criar / recuperar acesso</h1>
+        <p class="card-sub">Informe seu CPF para receber o código de verificação no WhatsApp.</p>
+        <div class="field">
+          <label for="pa-cpf">CPF</label>
+          <input type="text" id="pa-cpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14" autocomplete="username" required aria-required="true">
+        </div>
+        <div class="alert alert-error" id="alert-pa-cpf" role="alert" aria-live="polite"></div>
+        <button class="btn-main" type="button" id="btn-pa-cpf" onclick="handleIniciarVerificacao()">
+          <span id="btn-pa-cpf-txt">Continuar</span>
+        </button>
+        <button class="btn-ghost" type="button" onclick="goScreen('screen-login')">← Voltar ao login</button>
+      </div>
+
+      <!-- Passo 2b: mostrar código e aguardar WhatsApp -->
+      <div id="pa-step-codigo" style="display:none">
+        <h1 class="card-title">Confirme pelo WhatsApp</h1>
+        <p class="telefone-hint" id="pa-telefone-hint">Envie o código para <b id="pa-telefone-masked"></b></p>
+
+        <div class="codigo-box" aria-live="polite">
+          <div class="codigo-label">Seu código</div>
+          <div class="codigo-val" id="pa-codigo"></div>
+          <div class="codigo-hint">Clique no botão abaixo para abrir o WhatsApp com o código já preenchido.</div>
+        </div>
+
+        <button class="btn-main" type="button" id="btn-wa" onclick="abrirWhatsApp()">
+          💬 Enviar código no WhatsApp
+        </button>
+
+        <div class="status-poll pendente" id="poll-status" aria-live="polite">
+          <span class="status-dot"></span>
+          <span id="poll-txt">Aguardando confirmação no WhatsApp…</span>
+        </div>
+
+        <div class="alert alert-error" id="alert-pa-codigo" role="alert" aria-live="polite"></div>
+
+        <button class="btn-ghost" type="button" onclick="reiniciarPrimeiroAcesso()">Tentar com outro CPF</button>
+      </div>
+
+      <!-- Passo 2c: criar senha -->
+      <div id="pa-step-senha" style="display:none">
+        <h1 class="card-title">Criar sua senha</h1>
+        <p class="card-sub">Mínimo 6 caracteres. Use depois para entrar com CPF e senha.</p>
+
+        <div class="field">
+          <label for="pa-nova-senha">Nova senha</label>
+          <input type="password" id="pa-nova-senha" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6" required aria-required="true">
+        </div>
+        <div class="field">
+          <label for="pa-confirma-senha">Confirmar senha</label>
+          <input type="password" id="pa-confirma-senha" placeholder="Repita a senha" autocomplete="new-password" minlength="6" required aria-required="true">
+        </div>
+        <div class="field">
+          <label for="pa-nome">Seu nome <span style="font-weight:400;color:var(--muted)">(opcional)</span></label>
+          <input type="text" id="pa-nome" placeholder="Como quer ser chamada?" autocomplete="given-name">
+        </div>
+        <div class="field">
+          <label for="pa-telefone">WhatsApp <span style="font-weight:400;color:var(--muted)">(opcional)</span></label>
+          <input type="tel" id="pa-telefone" inputmode="numeric" placeholder="(85) 9 9999-9999" autocomplete="tel">
+        </div>
+        <div class="alert alert-error" id="alert-pa-senha" role="alert" aria-live="polite"></div>
+        <button class="btn-main" type="button" id="btn-pa-senha" onclick="handleDefinirSenha()">
+          <span id="btn-pa-senha-txt">Criar conta e entrar</span>
+        </button>
+      </div>
+
+    </div><!-- /.card -->
+  </div><!-- /#screen-primeiro-acesso -->
+
+  <!-- ======================================================
+       TELA 3 — Histórico de pedidos
+  ====================================================== -->
+  <div class="screen" id="screen-historico">
+    <div class="hist-header">
+      <div>
+        <h1 class="hist-saudacao" id="hist-saudacao">Olá!</h1>
+        <p class="hist-sub">Seu histórico de compras na Lira Fraldas.</p>
+      </div>
+      <button class="btn-sair" type="button" onclick="handleSair()">Sair</button>
+    </div>
+
+    <!-- loading -->
+    <div id="hist-loading" class="spinner-page" aria-live="polite" aria-label="Carregando pedidos">
+      <div class="sp"></div>
+    </div>
+
+    <!-- lista de pedidos -->
+    <div class="pedido-list" id="hist-lista" hidden></div>
+
+    <!-- estado vazio -->
+    <div class="empty-hist" id="hist-vazio" hidden>
+      <div class="empty-icon">🍼</div>
+      <p>Você ainda não tem pedidos — bora fazer o primeiro?</p>
+      <a href="index.html">Ver produtos na loja →</a>
+    </div>
+
+    <!-- erro de rede -->
+    <div class="alert alert-error" id="hist-erro" role="alert" aria-live="polite" style="margin-top:0"></div>
+  </div>
+
+</main>
+
+<footer class="slim">
+  © 2026 Lira Fraldas &mdash; <a href="index.html">Voltar à loja</a>
+</footer>
+
+<script>
+  'use strict';
+
+  // ─────────────────────────────────────────────
+  // Configuração
+  // ─────────────────────────────────────────────
+  const API_BASE = "https://erp-lira.audex.com.br";
+  const SITE_KEY = "lira_a96d4d6e4c22f773bcf01374d00ba4118f260afebfdb62d9";
+  const LS_TOKEN = "lira-cliente-token";
+  const LS_CLIENTE = "lira-cliente";
+
+  // ─────────────────────────────────────────────
+  // Estado de sessão (NUNCA logar token)
+  // ─────────────────────────────────────────────
+  let _token = null;
+  let _cliente = null;
+  let _pollInterval = null;
+  let _pollTimeout = null;
+  let _pollCodigo = null;
+  let _paCpfAtual = null;
+  let _paWaLink = null;
+
+  // ─────────────────────────────────────────────
+  // Helpers de storage (não logar valor de token)
+  // ─────────────────────────────────────────────
+  function salvarSessao(token, cliente) {
+    _token = token;
+    _cliente = cliente;
+    try { localStorage.setItem(LS_TOKEN, token); } catch(_) {}
+    try { localStorage.setItem(LS_CLIENTE, JSON.stringify(cliente)); } catch(_) {}
+  }
+
+  function limparSessao() {
+    _token = null;
+    _cliente = null;
+    try { localStorage.removeItem(LS_TOKEN); } catch(_) {}
+    try { localStorage.removeItem(LS_CLIENTE); } catch(_) {}
+  }
+
+  function carregarSessao() {
+    try {
+      const t = localStorage.getItem(LS_TOKEN);
+      const c = JSON.parse(localStorage.getItem(LS_CLIENTE) || "null");
+      if (t && c) { _token = t; _cliente = c; return true; }
+    } catch(_) {}
+    return false;
+  }
+
+  // ─────────────────────────────────────────────
+  // Helpers de UI
+  // ─────────────────────────────────────────────
+  function goScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById(id);
+    if (el) el.classList.add('active');
+  }
+
+  function setAlert(id, msg, show) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg || '';
+    el.classList.toggle('show', !!show);
+  }
+
+  function setBtnLoading(btnId, txtId, loading, txt) {
+    const btn = document.getElementById(btnId);
+    const span = document.getElementById(txtId);
+    if (!btn || !span) return;
+    btn.disabled = loading;
+    if (loading) {
+      btn.innerHTML = '<div class="spinner"></div>';
+    } else {
+      span.textContent = txt;
+      btn.innerHTML = '';
+      btn.appendChild(span);
+    }
+  }
+
+  // CPF: 000.000.000-00
+  function maskCpf(el) {
+    let v = el.value.replace(/\D/g, '').slice(0, 11);
+    if (v.length > 9) v = v.slice(0,3)+'.'+v.slice(3,6)+'.'+v.slice(6,9)+'-'+v.slice(9);
+    else if (v.length > 6) v = v.slice(0,3)+'.'+v.slice(3,6)+'.'+v.slice(6);
+    else if (v.length > 3) v = v.slice(0,3)+'.'+v.slice(3);
+    el.value = v;
+  }
+
+  function cpfNudo(cpf) { return (cpf||'').replace(/\D/g,''); }
+
+  function fmtMoeda(v) {
+    const n = parseFloat(v) || 0;
+    return 'R$ ' + n.toFixed(2).replace('.', ',');
+  }
+
+  function fmtData(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d)) return iso;
+    return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
+  }
+
+  function msgErroRede(status) {
+    if (status === 429) return 'Muitas tentativas, aguarde 1 minuto e tente novamente.';
+    if (status === 401) return 'CPF ou senha inválidos.';
+    if (status === 400) return 'Dados inválidos. Verifique as informações e tente novamente.';
+    if (!status) return 'Sem conexão com o servidor. Verifique sua internet e tente novamente.';
+    return 'Erro inesperado. Tente novamente em instantes.';
+  }
+
+  // ─────────────────────────────────────────────
+  // Status → rótulo + badge class
+  // ─────────────────────────────────────────────
+  const STATUS_MAP = {
+    PENDENTE:    { label: 'Em preparação', cls: 'badge-amber' },
+    FINALIZADA:  { label: 'Concluído',     cls: 'badge-green' },
+    CANCELADA:   { label: 'Cancelado',     cls: 'badge-red'   },
+    DEVOLVIDA:   { label: 'Devolvido',     cls: 'badge-gray'  },
+    DUPLICADA:   { label: 'Concluído',     cls: 'badge-green' },
+  };
+
+  function badgeStatus(status) {
+    const s = STATUS_MAP[status] || { label: status, cls: 'badge-gray' };
+    return `<span class="badge ${s.cls}">${s.label}</span>`;
+  }
+
+  function labelCanal(canal) {
+    if (canal === 'SITE') return '🛒 Site';
+    if (canal === 'PDV')  return '🏪 Loja';
+    return canal || '';
+  }
+
+  // ─────────────────────────────────────────────
+  // API calls
+  // ─────────────────────────────────────────────
+  async function apiPublic(method, path, body) {
+    const opts = {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-site-api-key': SITE_KEY
+      }
+    };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(API_BASE + path, opts);
+    return res;
+  }
+
+  async function apiAuth(method, path) {
+    const opts = {
+      method,
+      headers: {
+        'x-site-api-key': SITE_KEY,
+        'Authorization': 'Bearer ' + _token
+      }
+    };
+    const res = await fetch(API_BASE + path, opts);
+    return res;
+  }
+
+  // ─────────────────────────────────────────────
+  // Inicialização
+  // ─────────────────────────────────────────────
+  async function init() {
+    // Máscara CPF nos inputs de login e primeiro acesso
+    ['login-cpf', 'pa-cpf'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', () => maskCpf(el));
+    });
+
+    // Enter no campo CPF do PA avança
+    const paCpfEl = document.getElementById('pa-cpf');
+    if (paCpfEl) {
+      paCpfEl.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); handleIniciarVerificacao(); }
+      });
+    }
+
+    // Enter no campo senha do login submete
+    const loginSenhaEl = document.getElementById('login-senha');
+    if (loginSenhaEl) {
+      loginSenhaEl.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); handleLogin(e); }
+      });
+    }
+
+    if (carregarSessao()) {
+      goScreen('screen-historico');
+      await carregarHistorico();
+    } else {
+      goScreen('screen-login');
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // Tela 1 — Login
+  // ─────────────────────────────────────────────
+  async function handleLogin(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    setAlert('alert-login', '', false);
+
+    const cpf = cpfNudo(document.getElementById('login-cpf').value);
+    const senha = document.getElementById('login-senha').value;
+
+    if (cpf.length !== 11) {
+      setAlert('alert-login', 'Digite um CPF válido com 11 dígitos.', true);
+      document.getElementById('login-cpf').focus();
+      return;
+    }
+    if (!senha || senha.length < 1) {
+      setAlert('alert-login', 'Digite sua senha.', true);
+      document.getElementById('login-senha').focus();
+      return;
+    }
+
+    const btn = document.getElementById('btn-login');
+    const span = document.getElementById('btn-login-txt');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div>';
+
+    try {
+      const res = await apiPublic('POST', '/api/public/cliente/login', { cpf, senha });
+      if (res.ok) {
+        const data = await res.json();
+        salvarSessao(data.token, data.cliente);
+        goScreen('screen-historico');
+        await carregarHistorico();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setAlert('alert-login', data.error || msgErroRede(res.status), true);
+        btn.disabled = false;
+        btn.innerHTML = '';
+        btn.appendChild(span);
+        span.textContent = 'Entrar';
+        document.getElementById('login-senha').focus();
+      }
+    } catch (_) {
+      setAlert('alert-login', msgErroRede(0), true);
+      btn.disabled = false;
+      btn.innerHTML = '';
+      btn.appendChild(span);
+      span.textContent = 'Entrar';
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // Tela 2 — Primeiro acesso / recuperação
+  // ─────────────────────────────────────────────
+  function reiniciarPrimeiroAcesso() {
+    pararPoll();
+    _paCpfAtual = null;
+    _pollCodigo = null;
+    _paWaLink = null;
+    document.getElementById('pa-cpf').value = '';
+    setAlert('alert-pa-cpf', '', false);
+    setAlert('alert-pa-codigo', '', false);
+    document.getElementById('pa-step-cpf').style.display = '';
+    document.getElementById('pa-step-codigo').style.display = 'none';
+    document.getElementById('pa-step-senha').style.display = 'none';
+    document.getElementById('btn-pa-cpf-txt').textContent = 'Continuar';
+    document.getElementById('btn-pa-cpf').disabled = false;
+    document.getElementById('pa-cpf').focus();
+  }
+
+  async function handleIniciarVerificacao() {
+    setAlert('alert-pa-cpf', '', false);
+
+    const cpf = cpfNudo(document.getElementById('pa-cpf').value);
+    if (cpf.length !== 11) {
+      setAlert('alert-pa-cpf', 'Digite um CPF válido com 11 dígitos.', true);
+      document.getElementById('pa-cpf').focus();
+      return;
+    }
+
+    const btn = document.getElementById('btn-pa-cpf');
+    const span = document.getElementById('btn-pa-cpf-txt');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div>';
+
+    try {
+      const res = await apiPublic('POST', '/api/public/cliente/iniciar-verificacao', {
+        cpf,
+        finalidade: 'PRIMEIRO_ACESSO'
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        _paCpfAtual = cpf;
+        _pollCodigo = data.codigo;
+        _paWaLink = data.waLink;
+
+        document.getElementById('pa-codigo').textContent = data.codigo || '';
+        const tel = data.telefoneMascarado || '';
+        document.getElementById('pa-telefone-masked').textContent = tel;
+        document.getElementById('pa-telefone-hint').style.display = tel ? '' : 'none';
+
+        document.getElementById('pa-step-cpf').style.display = 'none';
+        document.getElementById('pa-step-codigo').style.display = '';
+
+        // Reseta status do poll
+        setPollStatus('pendente', 'Aguardando confirmação no WhatsApp…');
+        setAlert('alert-pa-codigo', '', false);
+
+        iniciarPoll();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        const msg = res.status === 429
+          ? 'Muitas tentativas, aguarde 1 minuto e tente novamente.'
+          : (data.error || 'Não foi possível enviar o código. Tente novamente.');
+        setAlert('alert-pa-cpf', msg, true);
+        btn.disabled = false;
+        btn.innerHTML = '';
+        btn.appendChild(span);
+        span.textContent = 'Continuar';
+      }
+    } catch (_) {
+      setAlert('alert-pa-cpf', msgErroRede(0), true);
+      btn.disabled = false;
+      btn.innerHTML = '';
+      btn.appendChild(span);
+      span.textContent = 'Continuar';
+    }
+  }
+
+  function abrirWhatsApp() {
+    if (_paWaLink) {
+      window.open(_paWaLink, '_blank', 'noopener,noreferrer');
+    }
+  }
+
+  function setPollStatus(tipo, txt) {
+    const el = document.getElementById('poll-status');
+    if (!el) return;
+    el.className = 'status-poll ' + tipo;
+    const txtEl = document.getElementById('poll-txt');
+    if (txtEl) txtEl.textContent = txt;
+  }
+
+  function pararPoll() {
+    if (_pollInterval) { clearInterval(_pollInterval); _pollInterval = null; }
+    if (_pollTimeout)  { clearTimeout(_pollTimeout);  _pollTimeout  = null; }
+  }
+
+  function iniciarPoll() {
+    pararPoll();
+
+    const MAX_MS = 10 * 60 * 1000; // 10 minutos
+    const inicio = Date.now();
+
+    async function checar() {
+      if (!_pollCodigo) return;
+      try {
+        const res = await apiPublic('GET', `/api/public/cliente/verificacao/status?codigo=${encodeURIComponent(_pollCodigo)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        if (data.status === 'CONFIRMADO') {
+          pararPoll();
+          setPollStatus('confirmado', 'Código confirmado! Crie sua senha abaixo.');
+          // Avança para o passo de criar senha
+          setTimeout(() => {
+            document.getElementById('pa-step-codigo').style.display = 'none';
+            document.getElementById('pa-step-senha').style.display = '';
+            document.getElementById('pa-nova-senha').focus();
+          }, 700);
+          return;
+        }
+
+        if (data.status === 'EXPIRADO') {
+          pararPoll();
+          setPollStatus('expirado', 'Código expirado.');
+          setAlert('alert-pa-codigo', 'O código expirou. Clique abaixo para tentar novamente.', true);
+          return;
+        }
+
+        // PENDENTE — continua
+        if (Date.now() - inicio > MAX_MS) {
+          pararPoll();
+          setPollStatus('expirado', 'Tempo esgotado.');
+          setAlert('alert-pa-codigo', 'Tempo limite atingido. Tente novamente.', true);
+        }
+      } catch (_) {
+        // erro de rede no poll — ignora, tenta no próximo tick
+      }
+    }
+
+    // Primeira checagem após 3s
+    _pollTimeout = setTimeout(() => {
+      checar();
+      _pollInterval = setInterval(checar, 3000);
+    }, 3000);
+  }
+
+  async function handleDefinirSenha() {
+    setAlert('alert-pa-senha', '', false);
+
+    const senha = document.getElementById('pa-nova-senha').value;
+    const confirma = document.getElementById('pa-confirma-senha').value;
+    const nome = (document.getElementById('pa-nome').value || '').trim();
+    const telefone = (document.getElementById('pa-telefone').value || '').replace(/\D/g,'');
+
+    if (!senha || senha.length < 6) {
+      setAlert('alert-pa-senha', 'A senha deve ter ao menos 6 caracteres.', true);
+      document.getElementById('pa-nova-senha').focus();
+      return;
+    }
+    if (senha !== confirma) {
+      setAlert('alert-pa-senha', 'As senhas não coincidem.', true);
+      document.getElementById('pa-confirma-senha').focus();
+      return;
+    }
+
+    const btn = document.getElementById('btn-pa-senha');
+    const span = document.getElementById('btn-pa-senha-txt');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div>';
+
+    const body = {
+      cpf: _paCpfAtual,
+      codigo: _pollCodigo,
+      senha
+    };
+    if (nome) body.nome = nome;
+    if (telefone && telefone.length >= 10) body.telefone = telefone;
+
+    try {
+      const res = await apiPublic('POST', '/api/public/cliente/definir-senha', body);
+      if (res.ok) {
+        const data = await res.json();
+        salvarSessao(data.token, data.cliente);
+        goScreen('screen-historico');
+        await carregarHistorico();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        const msg = res.status === 429
+          ? 'Muitas tentativas, aguarde 1 minuto.'
+          : (data.error || 'Não foi possível criar a senha. Tente novamente.');
+        setAlert('alert-pa-senha', msg, true);
+        btn.disabled = false;
+        btn.innerHTML = '';
+        btn.appendChild(span);
+        span.textContent = 'Criar conta e entrar';
+      }
+    } catch (_) {
+      setAlert('alert-pa-senha', msgErroRede(0), true);
+      btn.disabled = false;
+      btn.innerHTML = '';
+      btn.appendChild(span);
+      span.textContent = 'Criar conta e entrar';
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // Tela 3 — Histórico
+  // ─────────────────────────────────────────────
+  async function carregarHistorico() {
+    // Saudação
+    const nome = (_cliente && _cliente.nome) ? _cliente.nome.split(' ')[0] : null;
+    document.getElementById('hist-saudacao').textContent = nome ? `Olá, ${nome}!` : 'Olá!';
+
+    document.getElementById('hist-loading').hidden = false;
+    document.getElementById('hist-lista').hidden = true;
+    document.getElementById('hist-vazio').hidden = true;
+    setAlert('hist-erro', '', false);
+
+    try {
+      const res = await apiAuth('GET', '/api/public/cliente/meus-pedidos');
+
+      if (res.status === 401) {
+        // Token inválido ou expirado
+        limparSessao();
+        goScreen('screen-login');
+        setAlert('alert-login', 'Sua sessão expirou. Faça login novamente.', true);
+        return;
+      }
+
+      if (!res.ok) {
+        document.getElementById('hist-loading').hidden = true;
+        setAlert('hist-erro', res.status === 429 ? 'Muitas tentativas, aguarde 1 minuto.' : msgErroRede(res.status), true);
+        return;
+      }
+
+      const pedidos = await res.json();
+      document.getElementById('hist-loading').hidden = true;
+
+      if (!pedidos || pedidos.length === 0) {
+        document.getElementById('hist-vazio').hidden = false;
+        return;
+      }
+
+      const lista = document.getElementById('hist-lista');
+      lista.innerHTML = pedidos.map(p => {
+        const num = p.numero ? `#${p.numero}` : '—';
+        const data = fmtData(p.createdAt);
+        const total = fmtMoeda(p.total);
+        const badge = badgeStatus(p.status);
+        const canal = labelCanal(p.canal);
+        const itens = p.qtdItens != null ? `${p.qtdItens} ${p.qtdItens === 1 ? 'item' : 'itens'}` : '';
+        return `<div class="pedido">
+          <div class="pedido-top">
+            <span class="pedido-num">Pedido ${num}</span>
+            <span class="pedido-data">${data}</span>
+          </div>
+          <div class="pedido-mid">
+            <span class="pedido-total">${total}</span>
+            ${badge}
+          </div>
+          <div class="pedido-info">${[canal, itens].filter(Boolean).join(' · ')}</div>
+        </div>`;
+      }).join('');
+      lista.hidden = false;
+
+    } catch (_) {
+      document.getElementById('hist-loading').hidden = true;
+      setAlert('hist-erro', msgErroRede(0), true);
+    }
+  }
+
+  function handleSair() {
+    pararPoll();
+    limparSessao();
+    goScreen('screen-login');
+    // Limpa os campos do form de login para segurança
+    document.getElementById('login-cpf').value = '';
+    document.getElementById('login-senha').value = '';
+    setAlert('alert-login', '', false);
+  }
+
+  // ─────────────────────────────────────────────
+  // Boot
+  // ─────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', init);
+</script>

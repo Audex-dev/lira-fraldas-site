@@ -429,7 +429,7 @@
       <button aria-label="Buscar" onclick="search(document.getElementById('q').value)">🔍</button>
     </form>
     <div class="hact">
-      <div class="hlink" role="button" tabindex="0" aria-label="Entrar na conta"><span class="ic">👤</span><span class="txt">Entrar</span></div>
+      <div class="hlink" role="button" tabindex="0" aria-label="Entrar na conta" onclick="location.href='conta.html'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();location.href='conta.html'}"><span class="ic">👤</span><span class="txt">Entrar</span></div>
       <div class="hlink" role="button" tabindex="0" aria-label="Ver favoritos" onclick="showFavs()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showFavs()}"><span class="ic">❤️</span><span class="txt">Favoritos</span><span class="cartn" id="favn">0</span></div>
       <div class="hlink" role="button" tabindex="0" aria-label="Ver carrinho" onclick="openCart()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openCart()}"><span class="ic">🛒</span><span class="txt">Carrinho</span><span class="cartn" id="cartn">0</span></div>
     </div>
